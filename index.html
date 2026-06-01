@@ -1,0 +1,761 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LOR Alliance Academy</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #fff2e8;
+      --panel: #ffffff;
+      --panel2: #ffe1ce;
+      --line: rgba(255, 111, 28, .28);
+      --text: #3f1606;
+      --muted: #7b5749;
+      --cyan: #b8f13c;
+      --green: #ff9f66;
+      --gold: #ffc247;
+      --red: #ff4f16;
+      --orange: #ff6f1c;
+      --peach: #ffa17b;
+      --cream: #fff2e8;
+      --purple: #4b0967;
+      --radius: 8px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 18% 8%, rgba(255, 111, 28, .26), transparent 28%),
+        radial-gradient(circle at 86% 14%, rgba(184, 241, 60, .28), transparent 26%),
+        linear-gradient(180deg, #fff6ef, var(--bg) 62%, #fff9f3);
+      letter-spacing: 0;
+    }
+    body:before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .55;
+      background-image:
+        linear-gradient(rgba(255,111,28,.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(75,9,103,.08) 1px, transparent 1px),
+        radial-gradient(circle, rgba(255,111,28,.42) 1px, transparent 1.6px);
+      background-size: 24px 24px, 24px 24px, 71px 71px;
+      mask-image: linear-gradient(180deg, black, transparent 92%);
+    }
+    button, input, select, textarea { font: inherit; }
+    button { border: 0; color: inherit; cursor: pointer; }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+    .app { position: relative; z-index: 1; width: min(100%, 560px); min-height: 100vh; margin: 0 auto; padding-bottom: 88px; }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px;
+      background: rgba(255, 246, 239, .92);
+      border-bottom: 1px solid rgba(255,111,28,.18);
+      backdrop-filter: blur(14px);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .mark { width: 38px; height: 34px; flex: 0 0 auto; display: block; overflow: hidden; border-radius: 6px; }
+    .mark img { width: 100%; height: 100%; display: block; object-fit: cover; object-position: center 56%; filter: drop-shadow(0 5px 8px rgba(255, 111, 28, .24)); }
+    h1 { margin: 0; font-size: clamp(19px, 5vw, 28px); line-height: 1; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    h1 b { color: var(--orange); }
+    main { padding: 18px; }
+    .view { display: none; animation: in .2s ease-out; }
+    .view.active { display: block; }
+    @keyframes in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255, 255, 255, .98), rgba(255, 232, 215, .98));
+      box-shadow: 0 18px 40px rgba(188, 83, 24, .17);
+    }
+    .hero {
+      min-height: 220px;
+      display: grid;
+      align-items: end;
+      margin-bottom: 18px;
+      padding: 18px;
+      border: 4px solid #ffb184;
+      border-radius: var(--radius);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, .32), rgba(255, 215, 188, .88)),
+        repeating-linear-gradient(0deg, rgba(255,111,28,.14) 0 1px, transparent 1px 16px),
+        repeating-linear-gradient(90deg, rgba(75,9,103,.08) 0 1px, transparent 1px 16px);
+      box-shadow: 0 18px 42px rgba(188, 83, 24, .2);
+    }
+    .kicker { margin: 0 0 8px; color: var(--purple); font-size: 12px; font-weight: 850; text-transform: uppercase; letter-spacing: .7px; }
+    .title { margin: 0 0 12px; font-size: clamp(28px, 8vw, 42px); line-height: 1.06; }
+    .lesson-title { color: var(--purple); }
+    .muted, p { color: var(--muted); line-height: 1.55; }
+    .panel { padding: 18px; }
+    .field { margin: 14px 0; }
+    label { display: block; margin-bottom: 7px; color: #5b2b18; font-size: 13px; font-weight: 800; }
+    input, select, textarea {
+      width: 100%;
+      min-height: 46px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,111,28,.24);
+      color: var(--text);
+      background: rgba(255, 255, 255, .78);
+      padding: 11px 12px;
+      outline: 0;
+    }
+    textarea { min-height: 92px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(255,111,28,.18); }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 48px;
+      padding: 0 16px;
+      border-radius: var(--radius);
+      color: #3f1606;
+      background: linear-gradient(135deg, #ff6f1c, #ffa17b);
+      font-weight: 900;
+    }
+    .btn.secondary { color: var(--text); background: rgba(255,255,255,.72); border: 1px solid rgba(255,111,28,.22); }
+    .btn.gold { background: linear-gradient(135deg, #ffc247, #b8f13c); color: #2e2100; }
+    .btn.danger { color: #fffaf5; background: linear-gradient(135deg, #8b2508, #ff4f16); }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .row > .btn { flex: 1 1 145px; }
+    .top-actions { display: flex; gap: 8px; align-items: center; }
+    .lang { width: 86px; }
+    .icon-btn { width: 42px; height: 42px; display: grid; place-items: center; border-radius: var(--radius); background: rgba(255,255,255,.72); border: 1px solid rgba(255,111,28,.22); }
+    .progress { height: 11px; border-radius: 99px; margin: 12px 0 18px; background: rgba(255,111,28,.16); overflow: hidden; }
+    .progress span { display: block; width: 0%; height: 100%; background: linear-gradient(90deg, var(--orange), var(--cyan)); transition: width .24s ease; }
+    .lesson-head { display: flex; justify-content: space-between; align-items: start; gap: 12px; margin-bottom: 16px; }
+    .pill, .badge { display: inline-flex; align-items: center; min-height: 30px; padding: 0 10px; border-radius: 99px; font-size: 12px; font-weight: 900; white-space: nowrap; }
+    .pill { color: #4b0967; background: rgba(255, 225, 206, .78); border: 1px solid rgba(255,111,28,.25); }
+    .badge { color: #091326; background: var(--gold); }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0 18px; }
+    .stat { padding: 12px 10px; border-radius: var(--radius); background: rgba(255,255,255,.72); border: 1px solid rgba(255,111,28,.18); }
+    .stat b { display: block; color: var(--gold); font-size: 21px; }
+    .stat span { color: var(--muted); font-size: 11px; font-weight: 850; text-transform: uppercase; }
+    .visual { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center; }
+    .mini { min-height: 112px; padding: 10px; border-radius: var(--radius); border: 1px solid rgba(255,111,28,.24); background: rgba(255,255,255,.72); }
+    .mini strong { display: block; margin-bottom: 8px; font-size: 13px; }
+    .troops { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+    .troops i { aspect-ratio: 1; border-radius: 3px; background: #f4d4c0; border: 1px solid rgba(255,111,28,.28); }
+    .troops i.on { background: #ff6f1c; }
+    .plus { font-size: 34px; font-weight: 950; }
+    .lesson-text { white-space: pre-line; color: #512718; }
+    .quiz { margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255,111,28,.18); }
+    .quiz h3 { margin: 0 0 12px; }
+    .answers { display: grid; gap: 9px; }
+    .answer { min-height: 46px; padding: 10px 12px; text-align: left; border-radius: var(--radius); background: rgba(255,255,255,.74); border: 1px solid rgba(255,111,28,.2); }
+    .answer.correct { background: rgba(156,255,146,.16); border-color: rgba(156,255,146,.72); }
+    .answer.wrong { background: rgba(255,107,131,.16); border-color: rgba(255,107,131,.72); }
+    .status { min-height: 28px; margin-top: 10px; color: var(--muted); font-size: 13px; }
+    .list { display: grid; gap: 10px; }
+    .item { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 14px; border-radius: var(--radius); background: rgba(255,255,255,.72); border: 1px solid rgba(255,111,28,.18); }
+    .item h3 { margin: 0 0 4px; font-size: 17px; }
+    .item p { margin: 0; font-size: 13px; }
+    nav {
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      z-index: 5;
+      transform: translateX(-50%);
+      width: min(100%, 560px);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      padding: 10px 12px 12px;
+      background: rgba(255,246,239,.94);
+      border-top: 1px solid rgba(255,111,28,.18);
+      backdrop-filter: blur(14px);
+    }
+    .nav { display: grid; justify-items: center; align-content: center; gap: 4px; min-height: 56px; border-radius: var(--radius); color: var(--muted); background: transparent; font-size: 11px; font-weight: 850; }
+    .nav svg { width: 21px; height: 21px; }
+    .nav.active { color: #3f1606; background: linear-gradient(135deg, #ffa17b, #b8f13c); }
+    .toast { position: fixed; left: 50%; bottom: 84px; z-index: 9; transform: translate(-50%, 16px); width: min(calc(100% - 32px), 520px); padding: 12px 14px; border-radius: var(--radius); color: #3f1606; background: #ffe1ce; border: 1px solid rgba(255,111,28,.26); font-weight: 850; opacity: 0; pointer-events: none; transition: .18s; }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    @media (max-width: 390px) {
+      header, main { padding-left: 12px; padding-right: 12px; }
+      .stats { grid-template-columns: 1fr; }
+      .lang { width: 76px; }
+      h1 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="brand"><span class="mark" aria-hidden="true"><img src="cat-icon.png" alt=""></span><h1>LOR <b>Academy</b></h1></div>
+      <div class="top-actions">
+        <select id="language" class="lang" aria-label="Language">
+          <option value="en">US EN</option><option value="zh">CN 中文</option><option value="de">DE</option><option value="ar">AR</option><option value="fr">FR</option><option value="id">ID</option><option value="fil">FIL</option><option value="tr">TR</option><option value="pl">PL</option><option value="nl">NL</option>
+        </select>
+        <button id="adminShortcut" class="icon-btn" title="Admin dashboard" aria-label="Admin dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 4v5c0 5-3.4 8.7-8 9-4.6-.3-8-4-8-9V7l8-4z"/><path d="M9 12l2 2 4-4"/></svg>
+        </button>
+      </div>
+    </header>
+    <main>
+      <section id="identityView" class="view active">
+        <div class="card panel">
+          <p class="kicker">Interactive Alliance Academy</p>
+          <h2 class="title">Enter member identity</h2>
+          <p>Required before lessons or quizzes. Your IGN, alliance, and state are saved locally and attached to scores, badges, and Discord embeds.</p>
+          <form id="identityForm">
+            <div class="field"><label for="ign">In-Game Name (IGN)</label><input id="ign" required placeholder="PollyGroot" autocomplete="nickname"></div>
+            <div class="field"><label for="alliance">Alliance Tag</label><input id="alliance" required placeholder="LOR" maxlength="12"></div>
+            <div class="field"><label for="stateNo">State Number</label><input id="stateNo" required placeholder="1204" inputmode="numeric" pattern="[0-9]+"></div>
+            <button class="btn" type="submit">Start Academy</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="homeView" class="view">
+        <div class="hero">
+          <div>
+            <p id="welcomeKicker" class="kicker">Member Training</p>
+            <h2 class="title">Alliance rules that come to life.</h2>
+            <div class="stats">
+              <div class="stat"><b id="xpStat">0</b><span>XP</span></div>
+              <div class="stat"><b id="streakStat">0</b><span>Streak</span></div>
+              <div class="stat"><b id="scoreStat">0%</b><span>Avg Score</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card panel">
+          <div class="lesson-head">
+            <div><p class="kicker">Certification</p><h2 id="certTitle" class="title lesson-title">Pending</h2></div>
+            <span id="certBadge" class="pill">0 / 8</span>
+          </div>
+          <p id="certCopy">Complete all lessons and score at least 80% to receive Alliance Rules Certified.</p>
+          <div class="progress"><span id="homeProgress"></span></div>
+          <button id="continueLesson" class="btn">Continue Lesson</button>
+        </div>
+      </section>
+
+      <section id="rulesView" class="view">
+        <div class="progress"><span id="lessonProgress"></span></div>
+        <div class="lesson-head">
+          <div><p id="ruleCount" class="kicker">Rule 1 of 8</p><h2 id="lessonTitle" class="title lesson-title"></h2></div>
+          <span id="timer" class="pill">00:00</span>
+        </div>
+        <div class="hero">
+          <div class="visual" aria-hidden="true">
+            <div class="mini"><strong>Rally Call</strong><div class="troops"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i></div></div>
+            <div class="plus">+</div>
+            <div class="mini"><strong>Team Timing</strong><div class="troops"><i class="on"></i><i></i><i></i><i></i></div></div>
+          </div>
+        </div>
+        <article class="card panel">
+          <p id="lessonText" class="lesson-text"></p>
+          <div class="quiz"><h3 id="questionText"></h3><div id="answers" class="answers"></div></div>
+          <div class="row" style="margin-top:16px"><button id="prevLesson" class="btn secondary">Previous</button><button id="understandBtn" class="btn" disabled>I Understand</button></div>
+          <div id="lessonStatus" class="status"></div>
+        </article>
+      </section>
+
+      <section id="eventsView" class="view">
+        <h2 class="title">🏅 Hall of Fame</h2>
+        <p>Ranks highest score, fastest completion, and most lessons completed. The daily Discord post sends automatically when a webhook exists and the app is opened.</p>
+        <div id="leaderboard" class="list"></div>
+      </section>
+
+      <section id="profileView" class="view">
+        <div class="card panel">
+          <p class="kicker">Player Profile</p>
+          <h2 id="profileName" class="title lesson-title">Member</h2>
+          <p id="profileMeta"></p>
+          <div class="stats">
+            <div class="stat"><b id="profileLessons">0</b><span>Lessons</span></div>
+            <div class="stat"><b id="profileCorrect">0</b><span>Correct</span></div>
+            <div class="stat"><b id="profileTime">0s</b><span>Time</span></div>
+          </div>
+          <div id="profileBadges" class="row"></div>
+          <div class="row" style="margin-top:16px"><button id="resetMember" class="btn secondary">Change Identity</button><button id="sendTestDiscord" class="btn gold">Test Discord</button></div>
+          <div id="profileStatus" class="status"></div>
+        </div>
+      </section>
+
+      <section id="adminView" class="view">
+        <h2 class="title">Admin Dashboard</h2>
+        <div class="card panel">
+          <h2>Discord Integration</h2>
+          <p>Admin is password-protected on this browser. To change the password, clear this site's browser storage and create a new one.</p>
+          <div class="field"><label for="webhookUrl">Discord Webhook URL</label><input id="webhookUrl" placeholder="https://discord.com/api/webhooks/..."></div>
+          <div class="field"><label for="channelName">Notification Channel</label><input id="channelName" placeholder="#rules-academy"></div>
+          <div class="field"><label for="roleMention">Role Mention</label><select id="roleMention"><option value="">No mention</option><option>@everyone</option><option>@Rules Team</option><option>@R4</option><option>@R5</option></select></div>
+          <div class="row"><button id="saveDiscord" class="btn">Save Discord Settings</button><button id="postLeaderboard" class="btn secondary">Post Hall of Fame</button></div>
+          <div id="adminStatus" class="status"></div>
+        </div>
+        <div class="card panel" style="margin-top:14px">
+          <h2>Database</h2>
+          <p>Paste your Supabase project settings here after creating the database tables. The app will sync lessons, quiz results, and leaderboard.</p>
+          <div class="field"><label for="supabaseUrl">Supabase Project URL</label><input id="supabaseUrl" placeholder="https://your-project.supabase.co"></div>
+          <div class="field"><label for="supabaseAnonKey">Supabase Anon Key</label><input id="supabaseAnonKey" placeholder="eyJhbGciOi..."></div>
+          <div class="row"><button id="saveSupabase" class="btn">Save Database</button><button id="syncSupabase" class="btn secondary">Sync Now</button></div>
+          <div id="databaseStatus" class="status"></div>
+        </div>
+        <div class="card panel" style="margin-top:14px">
+          <h2>Data Tools</h2>
+          <p>Use these to move rules and progress to another browser or keep a backup before editing.</p>
+          <div class="row">
+            <button id="exportData" class="btn secondary">Export Backup</button>
+            <button id="importData" class="btn gold">Import Backup</button>
+          </div>
+          <input id="importFile" type="file" accept="application/json" style="display:none">
+          <div id="dataStatus" class="status"></div>
+        </div>
+        <div class="card panel" style="margin-top:14px">
+          <h2>Rule Editor</h2>
+          <p>Add, edit, or delete lesson rules. Updates are stored locally and send a Rule Updated Discord embed when configured.</p>
+          <div class="field"><label for="ruleSelect">Lesson</label><select id="ruleSelect"></select></div>
+          <div class="field"><label for="ruleTitle">Title</label><input id="ruleTitle"></div>
+          <div class="field"><label for="ruleContent">Description</label><textarea id="ruleContent"></textarea></div>
+          <div class="field"><label for="ruleQuestion">Question</label><input id="ruleQuestion"></div>
+          <div class="field"><label for="ruleAnswer">Correct Answer</label><input id="ruleAnswer"></div>
+          <div class="row">
+            <button id="addRule" class="btn gold">Add New Rule</button>
+            <button id="saveRule" class="btn">Save Rule Update</button>
+            <button id="deleteRule" class="btn danger">Delete Rule</button>
+          </div>
+          <div id="ruleStatus" class="status"></div>
+        </div>
+      </section>
+    </main>
+    <nav>
+      <button class="nav active" data-view="homeView"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>Home</button>
+      <button class="nav" data-view="rulesView"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/></svg>Rules</button>
+      <button class="nav" data-view="eventsView"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M5 6H3a4 4 0 0 0 4 4"/><path d="M19 6h2a4 4 0 0 1-4 4"/></svg>Events</button>
+      <button class="nav" data-view="profileView"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>Profile</button>
+    </nav>
+    <div id="toast" class="toast"></div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const KEY = "lorAllianceAcademy.v1";
+    const COLORS = { passed: 0x52ff7a, failed: 0xff4f6d, pending: 0xffd469 };
+    const defaultLessons = [
+      ["bear-rally-calling","Bear Hunt - Rally Calling","TG2 and above members may call rallies.\n\nMinute 1: First row may call rallies.\nMinute 2: Second row may call rallies.\nMinute 3: Third row may call rallies.\nFinal 7 minutes: All members may call rallies.","Who can call rallies during the final 7 minutes?",["Only first row players","Only R4/R5","All members"],"All members"],
+      ["bear-rally-participation","Bear Hunt - Rally Participation","Always join the rally with the shortest remaining march time.\n\nPreferred joining heroes: Chenko, Amane, Yeonwo, Hilde, Amadeus, or No Hero.\n\nMaximum troops: 80,000 troops.","How many troops should be sent?",["50,000","80,000","120,000"],"80,000"],
+      ["sanctuary-attack","Sanctuary Battle - Attack Rules","Solo attacks are prohibited.\n\nOnly rally attacks are allowed.","Are solo attacks allowed?",["Yes","No","Only during the first minute"],"No"],
+      ["sanctuary-defense","Sanctuary Battle - Defense Setup","Recommended defensive heroes: Patrick, Howard, Saul, and Hilde.\n\nUse defensive heroes only when reinforcing or holding objectives.","Which heroes should be used for defense?",["Defensive heroes only","Gathering heroes","Any heroes"],"Defensive heroes only"],
+      ["sanctuary-troops","Sanctuary Battle - Troop Limits","Rally leaders: maximum 80,000 troops.\n\nRally joiners: maximum 80,000 troops.","What is the troop limit?",["60,000 troops","80,000 troops","No limit"],"80,000 troops"],
+      ["sanctuary-rewards","Sanctuary Battle - Reward Distribution","Rewards are distributed within 24 hours by R4/R5.\n\nHighest contributors receive maximum rewards. Remaining rewards are shared equally among active participants.","Who distributes rewards?",["R4/R5","Any participant","The highest contributor"],"R4/R5"],
+      ["swordland-registration","Swordland Registration","Participation is optional.\n\nMembers must register before the event starts. Only registered members will be included in planning and team assignments.","Can unregistered members join planning?",["Yes","No","Only if they ask in Discord"],"No"],
+      ["tri-alliance-registration","Tri Alliance Clash Registration","Participation is optional.\n\nMembers must register before the event starts. Only registered members will be included in planning and team assignments.","Who will be assigned to teams?",["Everyone online","Registered members only","Only R4/R5"],"Registered members only"]
+    ].map(x => ({ id:x[0], title:x[1], content:x[2], question:x[3], options:x[4], answer:x[5] }));
+    const i18n = {
+      en:["I Understand","Pending","Alliance Rules Certified","Continue Lesson"],
+      zh:["我明白","待完成","联盟规则认证","继续课程"], de:["Ich verstehe","Ausstehend","Allianzregeln zertifiziert","Lektion fortsetzen"],
+      ar:["فهمت","قيد الانتظار","معتمد بقواعد التحالف","متابعة الدرس"], fr:["Je comprends","En attente","Certifie regles d'alliance","Continuer"],
+      id:["Saya Mengerti","Tertunda","Tersertifikasi Aturan Aliansi","Lanjutkan"], fil:["Nauunawaan ko","Pending","Certified sa Alliance Rules","Ipagpatuloy"],
+      tr:["Anladim","Beklemede","Ittifak Kurallari Sertifikali","Derse Devam"], pl:["Rozumiem","Oczekuje","Certyfikat zasad sojuszu","Kontynuuj"], nl:["Ik begrijp het","In behandeling","Alliantieregels gecertificeerd","Ga verder"]
+    };
+    const uiText = {
+      en:{ cert:"Complete all lessons and score at least 80% to receive Alliance Rules Certified.", rule:"Rule", of:"of", correct:"Correct answer selected.", wrong:"Incorrect answer selected. Review the rule before continuing.", saved:"Lesson completed and saved locally.", failed:"Failed quiz recorded. Score below passing threshold." },
+      zh:{ cert:"完成所有课程并达到至少 80% 分数后，即可获得联盟规则认证。", rule:"规则", of:"/", correct:"答案正确。", wrong:"答案不正确，请复习规则后继续。", saved:"课程已完成并保存在本机。", failed:"测验未通过，分数低于及格线。" },
+      de:{ cert:"Schließe alle Lektionen ab und erreiche mindestens 80%, um die Allianzregeln-Zertifizierung zu erhalten.", rule:"Regel", of:"von", correct:"Richtige Antwort ausgewählt.", wrong:"Falsche Antwort. Lies die Regel noch einmal, bevor du fortfährst.", saved:"Lektion abgeschlossen und lokal gespeichert.", failed:"Quiz nicht bestanden. Punktzahl unter der Bestehensgrenze." },
+      ar:{ cert:"أكمل جميع الدروس واحصل على 80% على الأقل للحصول على شهادة قواعد التحالف.", rule:"القاعدة", of:"من", correct:"تم اختيار الإجابة الصحيحة.", wrong:"الإجابة غير صحيحة. راجع القاعدة قبل المتابعة.", saved:"تم إكمال الدرس وحفظه محلياً.", failed:"فشل الاختبار. النتيجة أقل من حد النجاح." },
+      fr:{ cert:"Terminez toutes les leçons et obtenez au moins 80 % pour recevoir la certification des règles d'alliance.", rule:"Règle", of:"sur", correct:"Bonne réponse sélectionnée.", wrong:"Réponse incorrecte. Relisez la règle avant de continuer.", saved:"Leçon terminée et enregistrée localement.", failed:"Quiz échoué. Score inférieur au seuil de réussite." },
+      id:{ cert:"Selesaikan semua pelajaran dan raih minimal 80% untuk menerima Sertifikasi Aturan Aliansi.", rule:"Aturan", of:"dari", correct:"Jawaban benar dipilih.", wrong:"Jawaban salah. Tinjau aturan sebelum melanjutkan.", saved:"Pelajaran selesai dan disimpan secara lokal.", failed:"Kuis gagal. Skor di bawah batas kelulusan." },
+      fil:{ cert:"Kumpletuhin ang lahat ng lesson at makakuha ng hindi bababa sa 80% para sa Alliance Rules Certified.", rule:"Rule", of:"ng", correct:"Tamang sagot ang napili.", wrong:"Maling sagot. Balikan muna ang rule bago magpatuloy.", saved:"Nakumpleto ang lesson at na-save locally.", failed:"Bagsak ang quiz. Mas mababa sa passing threshold ang score." },
+      tr:{ cert:"Alliance Rules Certified almak için tüm dersleri tamamla ve en az %80 puan al.", rule:"Kural", of:"/", correct:"Doğru cevap seçildi.", wrong:"Yanlış cevap. Devam etmeden önce kuralı tekrar gözden geçir.", saved:"Ders tamamlandı ve yerel olarak kaydedildi.", failed:"Quiz başarısız. Puan geçme eşiğinin altında." },
+      pl:{ cert:"Ukończ wszystkie lekcje i zdobądź co najmniej 80%, aby otrzymać certyfikat zasad sojuszu.", rule:"Zasada", of:"z", correct:"Wybrano poprawną odpowiedź.", wrong:"Niepoprawna odpowiedź. Przejrzyj zasadę przed kontynuacją.", saved:"Lekcja ukończona i zapisana lokalnie.", failed:"Quiz niezaliczony. Wynik poniżej progu zaliczenia." },
+      nl:{ cert:"Voltooi alle lessen en haal minimaal 80% om het certificaat Alliantieregels te ontvangen.", rule:"Regel", of:"van", correct:"Juiste antwoord geselecteerd.", wrong:"Onjuist antwoord. Bekijk de regel opnieuw voordat je verdergaat.", saved:"Les voltooid en lokaal opgeslagen.", failed:"Quiz niet gehaald. Score onder de slaagdrempel." }
+    };
+    const lessonI18n = {
+      zh:{
+        "bear-rally-calling":["熊猎 - 集结发起","TG2 及以上成员可以发起集结。\n\n第 1 分钟：第一排可以发起集结。\n第 2 分钟：第二排可以发起集结。\n第 3 分钟：第三排可以发起集结。\n最后 7 分钟：所有成员都可以发起集结。","最后 7 分钟谁可以发起集结？",["只有第一排玩家","只有 R4/R5","所有成员"]],
+        "bear-rally-participation":["熊猎 - 集结参与","始终加入剩余行军时间最短的集结。\n\n推荐加入英雄：Chenko、Amane、Yeonwo、Hilde、Amadeus 或不派英雄。\n\n最大兵力：80,000。","应该派多少兵力？",["50,000","80,000","120,000"]],
+        "sanctuary-attack":["圣所战 - 进攻规则","禁止单人攻击。\n\n只允许集结攻击。","允许单人攻击吗？",["是","否","只在第一分钟允许"]],
+        "sanctuary-defense":["圣所战 - 防守设置","推荐防守英雄：Patrick、Howard、Saul 和 Hilde。\n\n增援或占领目标时只使用防守英雄。","防守应该使用哪些英雄？",["只使用防守英雄","采集英雄","任何英雄"]],
+        "sanctuary-troops":["圣所战 - 兵力限制","集结队长：最多 80,000 兵力。\n\n集结加入者：最多 80,000 兵力。","兵力上限是多少？",["60,000 兵力","80,000 兵力","无限制"]],
+        "sanctuary-rewards":["圣所战 - 奖励分配","奖励由 R4/R5 在 24 小时内分配。\n\n贡献最高者获得最高奖励。剩余奖励由活跃参与者平均分享。","谁负责分配奖励？",["R4/R5","任何参与者","贡献最高者"]],
+        "swordland-registration":["剑之国报名","参与是自愿的。\n\n成员必须在活动开始前报名。只有已报名成员会被纳入规划和队伍分配。","未报名成员可以参与规划吗？",["可以","不可以","只要在 Discord 询问即可"]],
+        "tri-alliance-registration":["三盟冲突报名","参与是自愿的。\n\n成员必须在活动开始前报名。只有已报名成员会被纳入规划和队伍分配。","谁会被分配到队伍？",["所有在线成员","仅已报名成员","只有 R4/R5"]]
+      },
+      id:{
+        "bear-rally-calling":["Bear Hunt - Pemanggilan Rally","Anggota TG2 ke atas boleh memanggil rally.\n\nMenit 1: Baris pertama boleh memanggil rally.\nMenit 2: Baris kedua boleh memanggil rally.\nMenit 3: Baris ketiga boleh memanggil rally.\n7 menit terakhir: Semua anggota boleh memanggil rally.","Siapa yang boleh memanggil rally pada 7 menit terakhir?",["Hanya pemain baris pertama","Hanya R4/R5","Semua anggota"]],
+        "bear-rally-participation":["Bear Hunt - Mengikuti Rally","Selalu masuk ke rally dengan sisa waktu march paling pendek.\n\nHero yang disarankan: Chenko, Amane, Yeonwo, Hilde, Amadeus, atau tanpa hero.\n\nMaksimum pasukan: 80.000.","Berapa pasukan yang harus dikirim?",["50.000","80.000","120.000"]],
+        "sanctuary-attack":["Sanctuary Battle - Aturan Serangan","Serangan solo dilarang.\n\nHanya serangan rally yang diperbolehkan.","Apakah serangan solo diperbolehkan?",["Ya","Tidak","Hanya pada menit pertama"]],
+        "sanctuary-defense":["Sanctuary Battle - Pertahanan","Hero pertahanan yang disarankan: Patrick, Howard, Saul, dan Hilde.\n\nGunakan hanya hero pertahanan saat reinforce atau menjaga objektif.","Hero apa yang digunakan untuk bertahan?",["Hero pertahanan saja","Hero gathering","Hero apa saja"]],
+        "sanctuary-troops":["Sanctuary Battle - Batas Pasukan","Leader rally: maksimum 80.000 pasukan.\n\nJoiner rally: maksimum 80.000 pasukan.","Berapa batas pasukan?",["60.000 pasukan","80.000 pasukan","Tidak ada batas"]],
+        "sanctuary-rewards":["Sanctuary Battle - Pembagian Hadiah","Hadiah dibagikan dalam 24 jam oleh R4/R5.\n\nKontributor tertinggi menerima hadiah maksimum. Sisa hadiah dibagi rata kepada peserta aktif.","Siapa yang membagikan hadiah?",["R4/R5","Peserta mana saja","Kontributor tertinggi"]],
+        "swordland-registration":["Registrasi Swordland","Partisipasi bersifat opsional.\n\nAnggota harus mendaftar sebelum event dimulai. Hanya anggota terdaftar yang masuk perencanaan dan pembagian tim.","Apakah anggota yang tidak terdaftar bisa ikut perencanaan?",["Ya","Tidak","Hanya jika bertanya di Discord"]],
+        "tri-alliance-registration":["Registrasi Tri Alliance Clash","Partisipasi bersifat opsional.\n\nAnggota harus mendaftar sebelum event dimulai. Hanya anggota terdaftar yang masuk perencanaan dan pembagian tim.","Siapa yang akan dimasukkan ke tim?",["Semua yang online","Hanya anggota terdaftar","Hanya R4/R5"]]
+      }
+    };
+    Object.assign(lessonI18n, {
+      de:{
+        "bear-rally-calling":["Bärenjagd - Rallye ausrufen","Mitglieder ab TG2 dürfen Rallyes ausrufen.\n\nMinute 1: Erste Reihe darf Rallyes ausrufen.\nMinute 2: Zweite Reihe darf Rallyes ausrufen.\nMinute 3: Dritte Reihe darf Rallyes ausrufen.\nLetzte 7 Minuten: Alle Mitglieder dürfen Rallyes ausrufen.","Wer darf in den letzten 7 Minuten Rallyes ausrufen?",["Nur Spieler der ersten Reihe","Nur R4/R5","Alle Mitglieder"]],
+        "bear-rally-participation":["Bärenjagd - Rallye beitreten","Tritt immer der Rallye mit der kürzesten verbleibenden Marschzeit bei.\n\nEmpfohlene Helden: Chenko, Amane, Yeonwo, Hilde, Amadeus oder kein Held.\n\nMaximale Truppen: 80.000.","Wie viele Truppen sollen gesendet werden?",["50.000","80.000","120.000"]],
+        "sanctuary-attack":["Heiligtumsschlacht - Angriffsregeln","Soloangriffe sind verboten.\n\nNur Rallye-Angriffe sind erlaubt.","Sind Soloangriffe erlaubt?",["Ja","Nein","Nur in der ersten Minute"]],
+        "sanctuary-defense":["Heiligtumsschlacht - Verteidigung","Empfohlene Verteidigungshelden: Patrick, Howard, Saul und Hilde.\n\nNutze beim Verstärken oder Halten nur Verteidigungshelden.","Welche Helden sollen zur Verteidigung genutzt werden?",["Nur Verteidigungshelden","Sammelhelden","Beliebige Helden"]],
+        "sanctuary-troops":["Heiligtumsschlacht - Truppenlimit","Rallye-Anführer: maximal 80.000 Truppen.\n\nRallye-Teilnehmer: maximal 80.000 Truppen.","Wie hoch ist das Truppenlimit?",["60.000 Truppen","80.000 Truppen","Kein Limit"]],
+        "sanctuary-rewards":["Heiligtumsschlacht - Belohnungen","Belohnungen werden innerhalb von 24 Stunden durch R4/R5 verteilt.\n\nTop-Beiträger erhalten maximale Belohnungen. Der Rest wird gleichmäßig an aktive Teilnehmer verteilt.","Wer verteilt die Belohnungen?",["R4/R5","Jeder Teilnehmer","Der beste Beiträger"]],
+        "swordland-registration":["Swordland Registrierung","Teilnahme ist freiwillig.\n\nMitglieder müssen sich vor Eventbeginn registrieren. Nur registrierte Mitglieder werden geplant und Teams zugeteilt.","Dürfen nicht registrierte Mitglieder in die Planung?",["Ja","Nein","Nur wenn sie in Discord fragen"]],
+        "tri-alliance-registration":["Tri Alliance Clash Registrierung","Teilnahme ist freiwillig.\n\nMitglieder müssen sich vor Eventbeginn registrieren. Nur registrierte Mitglieder werden geplant und Teams zugeteilt.","Wer wird Teams zugeteilt?",["Alle Online-Mitglieder","Nur registrierte Mitglieder","Nur R4/R5"]]
+      },
+      fr:{
+        "bear-rally-calling":["Chasse à l'ours - Appel de rallye","Les membres TG2 et plus peuvent lancer des rallyes.\n\nMinute 1 : la première rangée peut lancer des rallyes.\nMinute 2 : la deuxième rangée peut lancer des rallyes.\nMinute 3 : la troisième rangée peut lancer des rallyes.\n7 dernières minutes : tous les membres peuvent lancer des rallyes.","Qui peut lancer des rallyes pendant les 7 dernières minutes ?",["Seulement la première rangée","Seulement R4/R5","Tous les membres"]],
+        "bear-rally-participation":["Chasse à l'ours - Participation","Rejoignez toujours le rallye avec le temps de marche restant le plus court.\n\nHéros recommandés : Chenko, Amane, Yeonwo, Hilde, Amadeus ou aucun héros.\n\nTroupes maximum : 80 000.","Combien de troupes faut-il envoyer ?",["50 000","80 000","120 000"]],
+        "sanctuary-attack":["Bataille du sanctuaire - Attaque","Les attaques solo sont interdites.\n\nSeules les attaques en rallye sont autorisées.","Les attaques solo sont-elles autorisées ?",["Oui","Non","Seulement la première minute"]],
+        "sanctuary-defense":["Bataille du sanctuaire - Défense","Héros défensifs recommandés : Patrick, Howard, Saul et Hilde.\n\nUtilisez uniquement des héros défensifs pour renforcer ou tenir un objectif.","Quels héros utiliser en défense ?",["Héros défensifs uniquement","Héros de collecte","N'importe quels héros"]],
+        "sanctuary-troops":["Bataille du sanctuaire - Limite de troupes","Chefs de rallye : maximum 80 000 troupes.\n\nParticipants au rallye : maximum 80 000 troupes.","Quelle est la limite de troupes ?",["60 000 troupes","80 000 troupes","Aucune limite"]],
+        "sanctuary-rewards":["Bataille du sanctuaire - Récompenses","Les récompenses sont distribuées sous 24 heures par R4/R5.\n\nLes meilleurs contributeurs reçoivent les meilleures récompenses. Le reste est partagé entre les participants actifs.","Qui distribue les récompenses ?",["R4/R5","N'importe quel participant","Le meilleur contributeur"]],
+        "swordland-registration":["Inscription Swordland","La participation est facultative.\n\nLes membres doivent s'inscrire avant le début de l'événement. Seuls les inscrits seront inclus dans la planification et les équipes.","Les non-inscrits peuvent-ils participer à la planification ?",["Oui","Non","Seulement s'ils demandent sur Discord"]],
+        "tri-alliance-registration":["Inscription Tri Alliance Clash","La participation est facultative.\n\nLes membres doivent s'inscrire avant le début de l'événement. Seuls les inscrits seront inclus dans la planification et les équipes.","Qui sera assigné aux équipes ?",["Tous les membres en ligne","Les membres inscrits uniquement","Seulement R4/R5"]]
+      },
+      fil:{
+        "bear-rally-calling":["Bear Hunt - Pagtawag ng Rally","Ang TG2 pataas ay maaaring tumawag ng rally.\n\nMinuto 1: Unang row ang maaaring tumawag.\nMinuto 2: Ikalawang row ang maaaring tumawag.\nMinuto 3: Ikatlong row ang maaaring tumawag.\nHuling 7 minuto: Lahat ng members ay maaaring tumawag.","Sino ang maaaring tumawag ng rally sa huling 7 minuto?",["Unang row lang","R4/R5 lang","Lahat ng members"]],
+        "bear-rally-participation":["Bear Hunt - Pagsali sa Rally","Sumali palagi sa rally na may pinakamaikling natitirang march time.\n\nRecommended heroes: Chenko, Amane, Yeonwo, Hilde, Amadeus, o No Hero.\n\nMaximum troops: 80,000.","Ilang troops ang dapat ipadala?",["50,000","80,000","120,000"]],
+        "sanctuary-attack":["Sanctuary Battle - Attack Rules","Bawal ang solo attacks.\n\nRally attacks lang ang allowed.","Allowed ba ang solo attacks?",["Oo","Hindi","Sa unang minuto lang"]],
+        "sanctuary-defense":["Sanctuary Battle - Defense Setup","Recommended defensive heroes: Patrick, Howard, Saul, at Hilde.\n\nDefensive heroes lang ang gamitin sa reinforcement o pag-hold ng objective.","Anong heroes ang dapat gamitin sa defense?",["Defensive heroes lang","Gathering heroes","Kahit anong heroes"]],
+        "sanctuary-troops":["Sanctuary Battle - Troop Limits","Rally leaders: maximum 80,000 troops.\n\nRally joiners: maximum 80,000 troops.","Ano ang troop limit?",["60,000 troops","80,000 troops","Walang limit"]],
+        "sanctuary-rewards":["Sanctuary Battle - Reward Distribution","Rewards ay ipapamahagi sa loob ng 24 oras ng R4/R5.\n\nHighest contributors ang makakatanggap ng maximum rewards. Ang natitira ay hahatiin sa active participants.","Sino ang nagdi-distribute ng rewards?",["R4/R5","Kahit sinong participant","Highest contributor"]],
+        "swordland-registration":["Swordland Registration","Optional ang participation.\n\nKailangang mag-register bago magsimula ang event. Registered members lang ang isasama sa planning at team assignments.","Pwede ba sa planning ang hindi registered?",["Oo","Hindi","Kung magtanong sa Discord"]],
+        "tri-alliance-registration":["Tri Alliance Clash Registration","Optional ang participation.\n\nKailangang mag-register bago magsimula ang event. Registered members lang ang isasama sa planning at team assignments.","Sino ang maa-assign sa teams?",["Lahat ng online","Registered members lang","R4/R5 lang"]]
+      },
+      tr:{
+        "bear-rally-calling":["Ayı Avı - Rally Çağırma","TG2 ve üzeri üyeler rally çağırabilir.\n\n1. dakika: İlk sıra rally çağırabilir.\n2. dakika: İkinci sıra rally çağırabilir.\n3. dakika: Üçüncü sıra rally çağırabilir.\nSon 7 dakika: Tüm üyeler rally çağırabilir.","Son 7 dakikada kim rally çağırabilir?",["Sadece ilk sıra oyuncuları","Sadece R4/R5","Tüm üyeler"]],
+        "bear-rally-participation":["Ayı Avı - Rally Katılımı","Her zaman kalan yürüyüş süresi en kısa olan rally'ye katıl.\n\nÖnerilen kahramanlar: Chenko, Amane, Yeonwo, Hilde, Amadeus veya kahramansız.\n\nMaksimum asker: 80.000.","Kaç asker gönderilmeli?",["50.000","80.000","120.000"]],
+        "sanctuary-attack":["Sanctuary Battle - Saldırı Kuralları","Solo saldırılar yasaktır.\n\nSadece rally saldırılarına izin verilir.","Solo saldırılar serbest mi?",["Evet","Hayır","Sadece ilk dakikada"]],
+        "sanctuary-defense":["Sanctuary Battle - Savunma","Önerilen savunma kahramanları: Patrick, Howard, Saul ve Hilde.\n\nTakviye veya hedef tutarken sadece savunma kahramanları kullan.","Savunmada hangi kahramanlar kullanılmalı?",["Sadece savunma kahramanları","Toplama kahramanları","Herhangi kahraman"]],
+        "sanctuary-troops":["Sanctuary Battle - Asker Limitleri","Rally liderleri: maksimum 80.000 asker.\n\nRally katılımcıları: maksimum 80.000 asker.","Asker limiti nedir?",["60.000 asker","80.000 asker","Limit yok"]],
+        "sanctuary-rewards":["Sanctuary Battle - Ödül Dağıtımı","Ödüller 24 saat içinde R4/R5 tarafından dağıtılır.\n\nEn yüksek katkı verenler maksimum ödül alır. Kalan ödüller aktif katılımcılar arasında eşit paylaşılır.","Ödülleri kim dağıtır?",["R4/R5","Herhangi katılımcı","En yüksek katkı veren"]],
+        "swordland-registration":["Swordland Kaydı","Katılım isteğe bağlıdır.\n\nÜyeler etkinlik başlamadan önce kayıt olmalıdır. Sadece kayıtlı üyeler planlama ve takım atamalarına dahil edilir.","Kayıtsız üyeler planlamaya katılabilir mi?",["Evet","Hayır","Discord'da sorarsa"]],
+        "tri-alliance-registration":["Tri Alliance Clash Kaydı","Katılım isteğe bağlıdır.\n\nÜyeler etkinlik başlamadan önce kayıt olmalıdır. Sadece kayıtlı üyeler planlama ve takım atamalarına dahil edilir.","Takımlara kim atanır?",["Çevrimiçi herkes","Sadece kayıtlı üyeler","Sadece R4/R5"]]
+      },
+      pl:{
+        "bear-rally-calling":["Polowanie na Niedźwiedzia - Zwoływanie rajdu","Członkowie TG2 i wyżej mogą zwoływać rajdy.\n\nMinuta 1: pierwszy rząd może zwoływać rajdy.\nMinuta 2: drugi rząd może zwoływać rajdy.\nMinuta 3: trzeci rząd może zwoływać rajdy.\nOstatnie 7 minut: wszyscy członkowie mogą zwoływać rajdy.","Kto może zwoływać rajdy w ostatnich 7 minutach?",["Tylko pierwszy rząd","Tylko R4/R5","Wszyscy członkowie"]],
+        "bear-rally-participation":["Polowanie na Niedźwiedzia - Udział","Zawsze dołączaj do rajdu z najkrótszym pozostałym czasem marszu.\n\nZaleceni bohaterowie: Chenko, Amane, Yeonwo, Hilde, Amadeus albo bez bohatera.\n\nMaksymalnie: 80 000 żołnierzy.","Ilu żołnierzy wysłać?",["50 000","80 000","120 000"]],
+        "sanctuary-attack":["Bitwa o Sanktuarium - Atak","Ataki solo są zabronione.\n\nDozwolone są tylko ataki rajdowe.","Czy ataki solo są dozwolone?",["Tak","Nie","Tylko w pierwszej minucie"]],
+        "sanctuary-defense":["Bitwa o Sanktuarium - Obrona","Zaleceni bohaterowie obronni: Patrick, Howard, Saul i Hilde.\n\nDo wzmocnień lub trzymania celu używaj tylko bohaterów obronnych.","Jakich bohaterów używać w obronie?",["Tylko bohaterowie obronni","Bohaterowie zbierający","Dowolni bohaterowie"]],
+        "sanctuary-troops":["Bitwa o Sanktuarium - Limity wojsk","Liderzy rajdu: maksymalnie 80 000 żołnierzy.\n\nUczestnicy rajdu: maksymalnie 80 000 żołnierzy.","Jaki jest limit wojsk?",["60 000 żołnierzy","80 000 żołnierzy","Brak limitu"]],
+        "sanctuary-rewards":["Bitwa o Sanktuarium - Nagrody","Nagrody są rozdawane w ciągu 24 godzin przez R4/R5.\n\nNajwięksi kontrybutorzy otrzymują maksymalne nagrody. Reszta jest dzielona między aktywnych uczestników.","Kto rozdaje nagrody?",["R4/R5","Dowolny uczestnik","Największy kontrybutor"]],
+        "swordland-registration":["Rejestracja Swordland","Udział jest opcjonalny.\n\nCzłonkowie muszą zarejestrować się przed startem wydarzenia. Tylko zarejestrowani członkowie będą uwzględnieni w planowaniu i zespołach.","Czy niezarejestrowani mogą brać udział w planowaniu?",["Tak","Nie","Tylko jeśli zapytają na Discordzie"]],
+        "tri-alliance-registration":["Rejestracja Tri Alliance Clash","Udział jest opcjonalny.\n\nCzłonkowie muszą zarejestrować się przed startem wydarzenia. Tylko zarejestrowani członkowie będą uwzględnieni w planowaniu i zespołach.","Kto zostanie przydzielony do zespołów?",["Wszyscy online","Tylko zarejestrowani członkowie","Tylko R4/R5"]]
+      },
+      nl:{
+        "bear-rally-calling":["Berenjacht - Rally oproepen","Leden vanaf TG2 mogen rally's oproepen.\n\nMinuut 1: eerste rij mag rally's oproepen.\nMinuut 2: tweede rij mag rally's oproepen.\nMinuut 3: derde rij mag rally's oproepen.\nLaatste 7 minuten: alle leden mogen rally's oproepen.","Wie mag in de laatste 7 minuten rally's oproepen?",["Alleen eerste rij spelers","Alleen R4/R5","Alle leden"]],
+        "bear-rally-participation":["Berenjacht - Rally deelname","Doe altijd mee aan de rally met de kortste resterende marsduur.\n\nAanbevolen helden: Chenko, Amane, Yeonwo, Hilde, Amadeus of geen held.\n\nMaximale troepen: 80.000.","Hoeveel troepen moeten worden gestuurd?",["50.000","80.000","120.000"]],
+        "sanctuary-attack":["Sanctuary Battle - Aanvalsregels","Solo-aanvallen zijn verboden.\n\nAlleen rally-aanvallen zijn toegestaan.","Zijn solo-aanvallen toegestaan?",["Ja","Nee","Alleen in de eerste minuut"]],
+        "sanctuary-defense":["Sanctuary Battle - Verdediging","Aanbevolen verdedigingshelden: Patrick, Howard, Saul en Hilde.\n\nGebruik alleen verdedigingshelden bij versterken of doelen vasthouden.","Welke helden gebruik je voor verdediging?",["Alleen verdedigingshelden","Verzamelhelden","Alle helden"]],
+        "sanctuary-troops":["Sanctuary Battle - Troepenlimieten","Rallyleiders: maximaal 80.000 troepen.\n\nRallydeelnemers: maximaal 80.000 troepen.","Wat is de troepenlimiet?",["60.000 troepen","80.000 troepen","Geen limiet"]],
+        "sanctuary-rewards":["Sanctuary Battle - Beloningen","Beloningen worden binnen 24 uur verdeeld door R4/R5.\n\nHoogste bijdragers krijgen maximale beloningen. De rest wordt gedeeld onder actieve deelnemers.","Wie verdeelt de beloningen?",["R4/R5","Elke deelnemer","De hoogste bijdrager"]],
+        "swordland-registration":["Swordland registratie","Deelname is optioneel.\n\nLeden moeten zich registreren voordat het event begint. Alleen geregistreerde leden worden meegenomen in planning en teams.","Kunnen niet-geregistreerde leden meedoen aan planning?",["Ja","Nee","Alleen als ze Discord vragen"]],
+        "tri-alliance-registration":["Tri Alliance Clash registratie","Deelname is optioneel.\n\nLeden moeten zich registreren voordat het event begint. Alleen geregistreerde leden worden meegenomen in planning en teams.","Wie wordt aan teams toegewezen?",["Iedereen online","Alleen geregistreerde leden","Alleen R4/R5"]]
+      },
+      ar:{
+        "bear-rally-calling":["صيد الدب - استدعاء التجمع","يمكن للأعضاء TG2 وما فوق استدعاء التجمعات.\n\nالدقيقة 1: الصف الأول يمكنه الاستدعاء.\nالدقيقة 2: الصف الثاني يمكنه الاستدعاء.\nالدقيقة 3: الصف الثالث يمكنه الاستدعاء.\nآخر 7 دقائق: جميع الأعضاء يمكنهم الاستدعاء.","من يمكنه استدعاء التجمع في آخر 7 دقائق؟",["لاعبو الصف الأول فقط","R4/R5 فقط","جميع الأعضاء"]],
+        "bear-rally-participation":["صيد الدب - المشاركة في التجمع","انضم دائماً إلى التجمع صاحب أقصر وقت مسير متبقٍ.\n\nالأبطال المفضلون: Chenko أو Amane أو Yeonwo أو Hilde أو Amadeus أو بدون بطل.\n\nالحد الأقصى للقوات: 80,000.","كم عدد القوات التي يجب إرسالها؟",["50,000","80,000","120,000"]],
+        "sanctuary-attack":["معركة الملاذ - قواعد الهجوم","الهجمات الفردية ممنوعة.\n\nالمسموح فقط هجمات التجمع.","هل الهجمات الفردية مسموحة؟",["نعم","لا","فقط في الدقيقة الأولى"]],
+        "sanctuary-defense":["معركة الملاذ - إعداد الدفاع","الأبطال الدفاعيون الموصى بهم: Patrick و Howard و Saul و Hilde.\n\nاستخدم الأبطال الدفاعيين فقط عند التعزيز أو تثبيت الهدف.","أي أبطال يجب استخدامهم للدفاع؟",["الأبطال الدفاعيون فقط","أبطال الجمع","أي أبطال"]],
+        "sanctuary-troops":["معركة الملاذ - حدود القوات","قادة التجمع: الحد الأقصى 80,000 جندي.\n\nالمشاركون في التجمع: الحد الأقصى 80,000 جندي.","ما هو حد القوات؟",["60,000 جندي","80,000 جندي","لا يوجد حد"]],
+        "sanctuary-rewards":["معركة الملاذ - توزيع المكافآت","يتم توزيع المكافآت خلال 24 ساعة بواسطة R4/R5.\n\nأعلى المساهمين يحصلون على أعلى المكافآت. الباقي يوزع بالتساوي على المشاركين النشطين.","من يوزع المكافآت؟",["R4/R5","أي مشارك","أعلى مساهم"]],
+        "swordland-registration":["تسجيل Swordland","المشاركة اختيارية.\n\nيجب على الأعضاء التسجيل قبل بدء الحدث. الأعضاء المسجلون فقط يدخلون في التخطيط وتوزيع الفرق.","هل يمكن لغير المسجلين دخول التخطيط؟",["نعم","لا","فقط إذا سألوا في Discord"]],
+        "tri-alliance-registration":["تسجيل Tri Alliance Clash","المشاركة اختيارية.\n\nيجب على الأعضاء التسجيل قبل بدء الحدث. الأعضاء المسجلون فقط يدخلون في التخطيط وتوزيع الفرق.","من سيتم تعيينه في الفرق؟",["كل المتصلين","الأعضاء المسجلون فقط","R4/R5 فقط"]]
+      }
+    });
+    const $ = id => document.getElementById(id);
+    const saved = JSON.parse(localStorage.getItem(KEY) || "{}");
+    const state = { identity:null, language:"en", lessons:defaultLessons, completions:{}, attempts:[], currentLesson:0, discord:{ webhookUrl:"", channelName:"", roleMention:"" }, supabase:{ url:"", anonKey:"" }, security:{ adminHash:"" }, leaderboard:[], lastLeaderboardPost:"", ...saved };
+    state.discord = { webhookUrl:"", channelName:"", roleMention:"", ...(saved.discord || {}) };
+    state.supabase = { url:"", anonKey:"", ...(saved.supabase || {}) };
+    state.security = { adminHash:"", ...(saved.security || {}) };
+    let current = Math.min(state.currentLesson || 0, state.lessons.length - 1), selected = "", start = Date.now(), timerId;
+    const save = () => localStorage.setItem(KEY, JSON.stringify(state));
+    const tr = n => (i18n[state.language] || i18n.en)[n];
+    const txt = key => (uiText[state.language] || uiText.en)[key] || uiText.en[key] || key;
+    const lessonCopy = lesson => {
+      const copy = lessonI18n[state.language]?.[lesson.id];
+      return copy ? { ...lesson, title:copy[0], content:copy[1], question:copy[2], options:copy[3] } : lesson;
+    };
+    const lessonOptionLabel = (lesson, option) => {
+      const copy = lessonI18n[state.language]?.[lesson.id];
+      if (!copy) return option;
+      const index = lesson.options.indexOf(option);
+      return copy[3][index] || option;
+    };
+    const normalizeSupabaseUrl = value => {
+      const raw = String(value || "").trim();
+      if (!raw) return "";
+      try {
+        const url = new URL(raw.startsWith("http") ? raw : `https://${raw}`);
+        return url.origin;
+      } catch {
+        return raw.replace(/\/rest\/v1\/?$/i, "").replace(/\/+$/, "");
+      }
+    };
+    const cloudReady = () => Boolean(state.supabase.url && state.supabase.anonKey && window.supabase?.createClient);
+    const cloud = () => window.supabase.createClient(normalizeSupabaseUrl(state.supabase.url), state.supabase.anonKey);
+    async function hashText(value){
+      const bytes = new TextEncoder().encode(value);
+      const hash = await crypto.subtle.digest("SHA-256", bytes);
+      return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+    async function unlockAdmin(){
+      if (!state.security.adminHash) {
+        const first = prompt("Create admin password");
+        if (!first || first.length < 4) {
+          toast("Admin password must be at least 4 characters.");
+          return false;
+        }
+        const second = prompt("Confirm admin password");
+        if (first !== second) {
+          toast("Admin passwords do not match.");
+          return false;
+        }
+        state.security.adminHash = await hashText(first);
+        save();
+        toast("Admin password created.");
+        return true;
+      }
+      const entered = prompt("Admin password");
+      if (!entered) return false;
+      const ok = await hashText(entered) === state.security.adminHash;
+      if (!ok) toast("Wrong admin password.");
+      return ok;
+    }
+    const pct = n => `${Math.round(n)}%`;
+    const utc = () => new Date().toISOString().replace("T"," ").slice(0,19) + " UTC";
+    const done = () => Object.keys(state.completions).length;
+    const correct = () => Object.values(state.completions).reduce((s,x)=>s+(x.correct?1:0),0);
+    const avg = () => { const a = Object.values(state.completions); return a.length ? a.reduce((s,x)=>s+x.score,0)/a.length : 0; };
+    const secs = () => Object.values(state.completions).reduce((s,x)=>s+x.durationSeconds,0);
+    const dur = s => { s = Math.max(0, Math.round(s || 0)); const m = Math.floor(s/60), r = s%60; return m ? `${m}m ${r}s` : `${r}s`; };
+    const certified = () => done() === state.lessons.length && avg() >= 80;
+    const esc = v => String(v).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+    const slug = value => String(value || "lesson").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "lesson";
+    function toast(msg){ $("toast").textContent = msg; $("toast").classList.add("show"); setTimeout(()=>$("toast").classList.remove("show"), 2800); }
+    function view(id){
+      if (!state.identity && id !== "identityView") id = "identityView";
+      document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === id));
+      document.querySelectorAll(".nav").forEach(b => b.classList.toggle("active", b.dataset.view === id));
+      if (id === "rulesView") startTimer();
+      render();
+    }
+    function startTimer(){
+      clearInterval(timerId); start = Date.now();
+      timerId = setInterval(() => { const e = Math.floor((Date.now()-start)/1000); $("timer").textContent = `${String(Math.floor(e/60)).padStart(2,"0")}:${String(e%60).padStart(2,"0")}`; }, 1000);
+    }
+    function render(){
+      $("language").value = state.language;
+      if (state.identity) { $("ign").value = state.identity.ign; $("alliance").value = state.identity.alliance; $("stateNo").value = state.identity.state; $("welcomeKicker").textContent = "Member Training"; }
+      $("xpStat").textContent = done() * 125; $("streakStat").textContent = Math.min(done(),7); $("scoreStat").textContent = pct(avg());
+      $("homeProgress").style.width = `${done()/state.lessons.length*100}%`; $("certTitle").textContent = certified() ? `🏆 ${tr(2)}` : tr(1); $("certCopy").textContent = txt("cert"); $("certBadge").textContent = `${done()} / ${state.lessons.length}`; $("continueLesson").textContent = tr(3);
+      const lesson = state.lessons[current], displayLesson = lessonCopy(lesson); $("lessonProgress").style.width = `${done()/state.lessons.length*100}%`; $("ruleCount").textContent = `${txt("rule")} ${current+1} ${txt("of")} ${state.lessons.length}`; $("lessonTitle").textContent = displayLesson.title; $("lessonText").textContent = displayLesson.content; $("questionText").textContent = displayLesson.question; $("understandBtn").textContent = tr(0); $("prevLesson").textContent = state.language === "en" ? "Previous" : "‹"; $("understandBtn").disabled = !selected; $("prevLesson").disabled = current === 0;
+      $("answers").innerHTML = ""; lesson.options.forEach(opt => { const b = document.createElement("button"); b.className = "answer"; if (selected) { if (opt === lesson.answer) b.classList.add("correct"); if (opt === selected && opt !== lesson.answer) b.classList.add("wrong"); } b.textContent = lessonOptionLabel(lesson, opt); b.disabled = !!selected; b.onclick = () => { selected = opt; $("lessonStatus").textContent = opt === lesson.answer ? txt("correct") : txt("wrong"); render(); }; $("answers").appendChild(b); });
+      if (state.identity) { $("profileName").textContent = state.identity.ign; $("profileMeta").textContent = "Member identity saved for quiz results and Discord notifications."; }
+      $("profileLessons").textContent = done(); $("profileCorrect").textContent = correct(); $("profileTime").textContent = dur(secs()); $("profileBadges").innerHTML = "";
+      const badges = []; if (done() >= 1) badges.push("Bear Hunt Specialist"); if (done() >= 4) badges.push("Event Master"); if (certified()) badges.push("Alliance Rules Expert"); badges.forEach(x => { const e = document.createElement("span"); e.className = "badge"; e.textContent = x; $("profileBadges").appendChild(e); });
+      renderBoard(); renderAdmin();
+    }
+    function renderBoard(){
+      const board = [...state.leaderboard].sort((a,b)=>b.averageScore-a.averageScore || a.totalTimeSeconds-b.totalTimeSeconds || b.lessonsCompleted-a.lessonsCompleted).slice(0,10);
+      $("leaderboard").innerHTML = board.length ? "" : `<div class="item"><div><h3>No learners yet</h3><p>Complete a lesson to enter the Hall of Fame.</p></div><span class="pill">Pending</span></div>`;
+      board.forEach((x,i)=>{ const e = document.createElement("div"); e.className = "item"; e.innerHTML = `<div><h3>${i+1}. ${esc(x.ign)}</h3><p>${esc(x.alliance)} - State ${esc(x.state)} - ${x.lessonsCompleted} lessons - ${dur(x.totalTimeSeconds)}</p></div><span class="pill">${pct(x.averageScore)}</span>`; $("leaderboard").appendChild(e); });
+    }
+    function renderAdmin(){
+      $("webhookUrl").value = state.discord.webhookUrl || ""; $("channelName").value = state.discord.channelName || ""; $("roleMention").value = state.discord.roleMention || "";
+      $("supabaseUrl").value = state.supabase.url || ""; $("supabaseAnonKey").value = state.supabase.anonKey || "";
+      current = Math.min(current, Math.max(0, state.lessons.length - 1));
+      const previous = $("ruleSelect").value; $("ruleSelect").innerHTML = ""; state.lessons.forEach((l,i)=>{ const o = document.createElement("option"); o.value = i; o.textContent = `${i+1}. ${l.title}`; $("ruleSelect").appendChild(o); }); if (previous && Number(previous) < state.lessons.length) $("ruleSelect").value = previous; hydrateRule();
+    }
+    function hydrateRule(){ const l = state.lessons[Number($("ruleSelect").value || 0)]; if (!l) return; $("ruleTitle").value = l.title; $("ruleContent").value = l.content; $("ruleQuestion").value = l.question; $("ruleAnswer").value = l.answer; }
+    function makeUniqueId(title){
+      const base = slug(title);
+      let id = base, n = 2;
+      while (state.lessons.some(l => l.id === id)) id = `${base}-${n++}`;
+      return id;
+    }
+    function exportBackup(){
+      const data = JSON.stringify({ exportedAt:utc(), app:"LOR Alliance Academy", state }, null, 2);
+      const blob = new Blob([data], { type:"application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `lor-academy-backup-${new Date().toISOString().slice(0,10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      $("dataStatus").textContent = "Backup exported.";
+    }
+    async function importBackup(file){
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+        const imported = data.state || data;
+        if (!Array.isArray(imported.lessons)) throw new Error("Backup file has no lessons.");
+        Object.assign(state, imported);
+        state.discord = { webhookUrl:"", channelName:"", roleMention:"", ...(imported.discord || {}) };
+        current = Math.min(state.currentLesson || 0, state.lessons.length - 1);
+        selected = "";
+        save();
+        render();
+        $("dataStatus").textContent = "Backup imported. Refresh is not required.";
+      } catch(e) {
+        $("dataStatus").textContent = `Import failed: ${e.message}`;
+      }
+    }
+    function updateBoard(){
+      const rec = { ign:state.identity.ign, alliance:state.identity.alliance, state:state.identity.state, averageScore:Math.round(avg()), lessonsCompleted:done(), totalTimeSeconds:secs(), certified:certified(), updatedAt:utc() };
+      state.leaderboard = state.leaderboard.filter(x => !(x.ign === rec.ign && x.alliance === rec.alliance && x.state === rec.state)); state.leaderboard.push(rec);
+    }
+    async function syncFromCloud(showMessage = true){
+      if (!cloudReady()) {
+        if (showMessage) $("databaseStatus").textContent = "Add Supabase API URL and anon public key first.";
+        return false;
+      }
+      try {
+        state.supabase.url = normalizeSupabaseUrl(state.supabase.url);
+        save();
+        const db = cloud();
+        const lessonsRes = await db.from("lessons").select("*").eq("enabled", true).order("position", { ascending:true });
+        if (lessonsRes.error) throw lessonsRes.error;
+        if (lessonsRes.data?.length) {
+          state.lessons = lessonsRes.data.map(row => ({ id:row.slug, title:row.title, content:row.content, question:row.question, options:row.options || [], answer:row.answer }));
+          current = Math.min(current, state.lessons.length - 1);
+        }
+        const boardRes = await db.from("leaderboard").select("*").limit(50);
+        if (boardRes.error) throw boardRes.error;
+        state.leaderboard = (boardRes.data || []).map(row => ({ ign:row.ign, alliance:row.alliance, state:row.state_no, averageScore:Number(row.average_score || 0), lessonsCompleted:Number(row.lessons_completed || 0), totalTimeSeconds:Number(row.total_time_seconds || 0), certified:Boolean(row.certified), updatedAt:row.updated_at || utc() }));
+        save();
+        render();
+        if (showMessage) $("databaseStatus").textContent = "Synced with Supabase.";
+        return true;
+      } catch(e) {
+        if (showMessage) $("databaseStatus").textContent = `Sync failed: ${e.message}. Check that URL looks like https://xxxxx.supabase.co and not the anon key.`;
+        return false;
+      }
+    }
+    async function saveLessonToCloud(lesson, position, enabled = true){
+      if (!cloudReady()) return false;
+      const { error } = await cloud().from("lessons").upsert({ slug:lesson.id, title:lesson.title, content:lesson.content, question:lesson.question, options:lesson.options, answer:lesson.answer, position, enabled });
+      if (error) { $("ruleStatus").textContent = `Cloud save failed: ${error.message}`; return false; }
+      return true;
+    }
+    async function saveCompletionToCloud(rec){
+      if (!cloudReady()) return false;
+      const payload = { ign:rec.ign, alliance:rec.alliance, state_no:rec.state, lesson_id:rec.lessonId, lesson_title:rec.lessonTitle, score:rec.score, correct:rec.correct, selected_answer:rec.selectedAnswer, correct_answer:rec.correctAnswer, duration_seconds:rec.durationSeconds, completed_at:new Date().toISOString() };
+      const { error } = await cloud().from("quiz_results").insert(payload);
+      if (error) { toast(`Database save failed: ${error.message}`); return false; }
+      await syncFromCloud(false);
+      return true;
+    }
+    function fields(p = {}){
+      return [
+        { name:"Player Name", value:p.ign || state.identity?.ign || "Unknown", inline:true },
+        { name:"Alliance", value:p.alliance || state.identity?.alliance || "Unknown", inline:true },
+        { name:"State", value:String(p.state || state.identity?.state || "Unknown"), inline:true },
+        { name:"Lesson", value:p.lessonTitle || "All Lessons", inline:false },
+        { name:"Score", value:p.finalScore !== undefined ? `${p.finalScore}%` : `${p.score ?? Math.round(avg())}%`, inline:true },
+        { name:"Completion Time", value:dur(p.durationSeconds || secs()), inline:true },
+        { name:"Completion Date", value:p.completedAt || utc(), inline:true },
+        { name:"Badge Earned", value:p.badge || (certified() ? "Alliance Rules Expert" : "Pending"), inline:false }
+      ];
+    }
+    function boardFields(){
+      const board = [...state.leaderboard].sort((a,b)=>b.averageScore-a.averageScore || a.totalTimeSeconds-b.totalTimeSeconds || b.lessonsCompleted-a.lessonsCompleted).slice(0,5);
+      return board.length ? board.map((x,i)=>({ name:`${i+1}. ${x.ign}`, value:`${x.alliance} - State ${x.state} - ${pct(x.averageScore)} - ${x.lessonsCompleted} lessons - ${dur(x.totalTimeSeconds)}`, inline:false })) : [{ name:"Hall of Fame", value:"No completed lessons yet.", inline:false }];
+    }
+    function discordPayload(type, p = {}){
+      const map = {
+        lesson_completed:["📝 Alliance Rule Completed", COLORS.passed, "Member finished a lesson."],
+        course_completed:["🏆 Alliance Academy Graduated", COLORS.passed, "Completed all Alliance Rules."],
+        failed_quiz:["❌ Alliance Quiz Failed", COLORS.failed, "Member scored below the passing threshold."],
+        new_member_certified:["🏆 New Member Certified", COLORS.passed, "Alliance Rules Certified badge awarded."],
+        rule_updated:["🟡 Alliance Rule Updated", COLORS.pending, "Admin updated a rule."],
+        leaderboard_daily:["🏅 Daily Hall of Fame", COLORS.pending, "Top learners by score, speed, and completed lessons."],
+        test:["🟢 Discord Webhook Test", COLORS.passed, "LOR Alliance Academy notifications are connected."]
+      };
+      const m = map[type] || map.test, mention = state.discord.roleMention ? `${state.discord.roleMention}\n` : "";
+      return { content:`${mention}${m[0]}`, embeds:[{ title:m[0], description:m[1] === COLORS.passed ? m[2] : m[2], color:m[1], fields:type === "leaderboard_daily" ? boardFields() : fields(p), timestamp:new Date().toISOString(), footer:{ text:"LOR Alliance Academy" } }] };
+    }
+    async function sendDiscord(type, p = {}){
+      if (!state.discord.webhookUrl) return false;
+      try {
+        const res = await fetch(state.discord.webhookUrl, { method:"POST", headers:{ "Content-Type":"application/json" }, body:JSON.stringify(discordPayload(type,p)) });
+        if (!res.ok) throw new Error(`Discord returned ${res.status}`);
+        return true;
+      } catch(e) { toast(`Discord notification failed: ${e.message}`); return false; }
+    }
+    async function postBoard(force = false){
+      const today = new Date().toISOString().slice(0,10);
+      if (!force && state.lastLeaderboardPost === today) return;
+      const sent = await sendDiscord("leaderboard_daily", {});
+      if (sent) { state.lastLeaderboardPost = today; save(); toast("Hall of Fame posted to Discord."); }
+    }
+    async function completeLesson(){
+      const l = state.lessons[current], ok = selected === l.answer, durationSeconds = Math.max(1, Math.round((Date.now()-start)/1000));
+      const rec = { ign:state.identity.ign, alliance:state.identity.alliance, state:state.identity.state, lessonId:l.id, lessonTitle:l.title, score:ok ? 100 : 0, correct:ok, selectedAnswer:selected, correctAnswer:l.answer, durationSeconds, completedAt:utc() };
+      state.completions[l.id] = rec; state.attempts.push(rec); updateBoard(); save(); await saveCompletionToCloud(rec);
+      await sendDiscord(ok ? "lesson_completed" : "failed_quiz", rec);
+      if (certified()) { await sendDiscord("course_completed", { ...rec, finalScore:Math.round(avg()) }); await sendDiscord("new_member_certified", { ...rec, finalScore:Math.round(avg()), badge:"Alliance Rules Expert" }); }
+      selected = ""; $("lessonStatus").textContent = ok ? txt("saved") : txt("failed");
+      if (current < state.lessons.length - 1) current += 1; state.currentLesson = current; save(); startTimer(); render(); toast(ok ? "Lesson completed." : "Quiz failed. Review and continue.");
+    }
+    $("identityForm").onsubmit = e => { e.preventDefault(); state.identity = { ign:$("ign").value.trim(), alliance:$("alliance").value.trim().toUpperCase(), state:$("stateNo").value.trim() }; save(); view("homeView"); postBoard(false); };
+    document.querySelectorAll(".nav").forEach(b => b.onclick = () => view(b.dataset.view));
+    $("adminShortcut").onclick = async () => { if (await unlockAdmin()) view("adminView"); }; $("continueLesson").onclick = () => view("rulesView");
+    $("prevLesson").onclick = () => { if (current > 0) current--; selected = ""; state.currentLesson = current; save(); startTimer(); render(); };
+    $("understandBtn").onclick = completeLesson; $("language").onchange = () => { state.language = $("language").value; save(); render(); };
+    $("resetMember").onclick = () => { state.identity = null; state.currentLesson = 0; save(); view("identityView"); };
+    $("saveDiscord").onclick = () => { state.discord = { webhookUrl:$("webhookUrl").value.trim(), channelName:$("channelName").value.trim(), roleMention:$("roleMention").value }; save(); $("adminStatus").textContent = `Discord settings saved${state.discord.channelName ? ` for ${state.discord.channelName}` : ""}.`; };
+    $("saveSupabase").onclick = async () => { state.supabase = { url:normalizeSupabaseUrl($("supabaseUrl").value), anonKey:$("supabaseAnonKey").value.trim() }; save(); $("supabaseUrl").value = state.supabase.url; $("databaseStatus").textContent = "Database settings saved."; await syncFromCloud(true); };
+    $("syncSupabase").onclick = () => syncFromCloud(true);
+    $("sendTestDiscord").onclick = async () => { const sent = await sendDiscord("test", { lessonTitle:"Webhook Test", score:100, durationSeconds:1 }); $("profileStatus").textContent = sent ? "Test Discord embed sent." : "Add a webhook URL in Admin first."; };
+    $("postLeaderboard").onclick = () => postBoard(true); $("ruleSelect").onchange = hydrateRule;
+    $("exportData").onclick = exportBackup;
+    $("importData").onclick = () => $("importFile").click();
+    $("importFile").onchange = e => importBackup(e.target.files[0]);
+    $("addRule").onclick = () => {
+      const count = state.lessons.length + 1;
+      const lesson = {
+        id: makeUniqueId(`new-rule-${count}`),
+        title: `New Rule ${count}`,
+        content: "Write the rule details here.",
+        question: "Add a quiz question here.",
+        options: ["Correct answer", "Wrong answer 1", "Wrong answer 2"],
+        answer: "Correct answer"
+      };
+      state.lessons.push(lesson);
+      current = state.lessons.length - 1;
+      state.currentLesson = current;
+      save();
+      saveLessonToCloud(lesson, current + 1);
+      render();
+      $("ruleSelect").value = String(current);
+      hydrateRule();
+      $("ruleStatus").textContent = "New rule added. Edit the fields, then press Save Rule Update.";
+    };
+    $("deleteRule").onclick = () => {
+      if (state.lessons.length <= 1) {
+        $("ruleStatus").textContent = "You must keep at least one rule.";
+        return;
+      }
+      const i = Number($("ruleSelect").value || 0);
+      const removed = state.lessons.splice(i, 1)[0];
+      delete state.completions[removed.id];
+      current = Math.min(current, state.lessons.length - 1);
+      state.currentLesson = current;
+      save();
+      if (cloudReady()) cloud().from("lessons").update({ enabled:false }).eq("slug", removed.id);
+      render();
+      $("ruleStatus").textContent = `Deleted: ${removed.title}`;
+    };
+    $("saveRule").onclick = async () => { const i = Number($("ruleSelect").value || 0), l = state.lessons[i]; l.title = $("ruleTitle").value.trim() || `Rule ${i+1}`; l.id = l.id || makeUniqueId(l.title); l.content = $("ruleContent").value.trim() || "Rule details pending."; l.question = $("ruleQuestion").value.trim() || "Question pending."; l.answer = $("ruleAnswer").value.trim() || "Correct answer"; if (!l.options.includes(l.answer)) l.options = [l.answer, ...l.options.slice(0,2)]; await saveLessonToCloud(l, i + 1); save(); render(); await sendDiscord("rule_updated", { lessonTitle:l.title, score:0, durationSeconds:0, badge:"Pending" }); $("ruleStatus").textContent = "Rule updated locally and notification sent when webhook is configured."; };
+    render(); view(state.identity ? "homeView" : "identityView"); if (state.identity) postBoard(false); syncFromCloud(false);
+  </script>
+</body>
+</html>
