@@ -83,7 +83,7 @@
     .hero {
       min-height: 220px;
       display: grid;
-      align-items: end;
+      align-items: center;
       margin-bottom: 18px;
       padding: 18px;
       border: 4px solid #ffb184;
@@ -143,6 +143,17 @@
     .stat { padding: 12px 10px; border-radius: var(--radius); background: rgba(255,255,255,.72); border: 1px solid rgba(255,111,28,.18); }
     .stat b { display: block; color: var(--gold); font-size: 21px; }
     .stat span { color: var(--muted); font-size: 11px; font-weight: 850; text-transform: uppercase; }
+    .lesson-brief { width: 100%; }
+    .lesson-brief .lesson-text {
+      margin: 0;
+      padding: 18px;
+      border-radius: var(--radius);
+      color: #512718;
+      background: rgba(255,255,255,.62);
+      border: 1px solid rgba(255,111,28,.2);
+      font-size: 18px;
+      line-height: 1.7;
+    }
     .visual { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center; }
     .mini { min-height: 112px; padding: 10px; border-radius: var(--radius); border: 1px solid rgba(255,111,28,.24); background: rgba(255,255,255,.72); }
     .mini strong { display: block; margin-bottom: 8px; font-size: 13px; }
@@ -196,7 +207,7 @@
       <div class="brand"><span class="mark" aria-hidden="true"><img src="cat-icon.png" alt=""></span><h1>LOR <b>Academy</b></h1></div>
       <div class="top-actions">
         <select id="language" class="lang" aria-label="Language">
-          <option value="en">US EN</option><option value="zh">CN 中文</option><option value="de">DE</option><option value="ar">AR</option><option value="fr">FR</option><option value="id">ID</option><option value="fil">FIL</option><option value="tr">TR</option><option value="pl">PL</option><option value="nl">NL</option>
+          <option value="en">🇺🇸</option><option value="zh">🇨🇳</option><option value="de">🇩🇪</option><option value="ar">🇸🇦</option><option value="fr">🇫🇷</option><option value="id">🇮🇩</option><option value="fil">🇵🇭</option><option value="tr">🇹🇷</option><option value="pl">🇵🇱</option><option value="nl">🇳🇱</option>
         </select>
         <button id="adminShortcut" class="icon-btn" title="Admin dashboard" aria-label="Admin dashboard">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 4v5c0 5-3.4 8.7-8 9-4.6-.3-8-4-8-9V7l8-4z"/><path d="M9 12l2 2 4-4"/></svg>
@@ -248,14 +259,11 @@
           <span id="timer" class="pill">00:00</span>
         </div>
         <div class="hero">
-          <div class="visual" aria-hidden="true">
-            <div class="mini"><strong>Rally Call</strong><div class="troops"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i></div></div>
-            <div class="plus">+</div>
-            <div class="mini"><strong>Team Timing</strong><div class="troops"><i class="on"></i><i></i><i></i><i></i></div></div>
+          <div class="lesson-brief">
+            <p id="lessonText" class="lesson-text"></p>
           </div>
         </div>
         <article class="card panel">
-          <p id="lessonText" class="lesson-text"></p>
           <div class="quiz"><h3 id="questionText"></h3><div id="answers" class="answers"></div></div>
           <div class="row" style="margin-top:16px"><button id="prevLesson" class="btn secondary">Previous</button><button id="understandBtn" class="btn" disabled>I Understand</button></div>
           <div id="lessonStatus" class="status"></div>
@@ -270,7 +278,7 @@
 
       <section id="profileView" class="view">
         <div class="card panel">
-          <p class="kicker">Player Profile</p>
+          <p id="profileKicker" class="kicker">Player Profile</p>
           <h2 id="profileName" class="title lesson-title">Member</h2>
           <p id="profileMeta"></p>
           <div class="stats">
@@ -288,7 +296,7 @@
         <h2 class="title">Admin Dashboard</h2>
         <div class="card panel">
           <h2>Discord Integration</h2>
-          <p>Admin is password-protected on this browser. To change the password, clear this site's browser storage and create a new one.</p>
+          <p>Admin is password-protected. Enter the admin code to edit Discord, database, and lessons.</p>
           <div class="field"><label for="webhookUrl">Discord Webhook URL</label><input id="webhookUrl" placeholder="https://discord.com/api/webhooks/..."></div>
           <div class="field"><label for="channelName">Notification Channel</label><input id="channelName" placeholder="#rules-academy"></div>
           <div class="field"><label for="roleMention">Role Mention</label><select id="roleMention"><option value="">No mention</option><option>@everyone</option><option>@Rules Team</option><option>@R4</option><option>@R5</option></select></div>
@@ -360,16 +368,16 @@
       tr:["Anladim","Beklemede","Ittifak Kurallari Sertifikali","Derse Devam"], pl:["Rozumiem","Oczekuje","Certyfikat zasad sojuszu","Kontynuuj"], nl:["Ik begrijp het","In behandeling","Alliantieregels gecertificeerd","Ga verder"]
     };
     const uiText = {
-      en:{ cert:"Complete all lessons and score at least 80% to receive Alliance Rules Certified.", rule:"Rule", of:"of", correct:"Correct answer selected.", wrong:"Incorrect answer selected. Review the rule before continuing.", saved:"Lesson completed and saved locally.", failed:"Failed quiz recorded. Score below passing threshold." },
-      zh:{ cert:"完成所有课程并达到至少 80% 分数后，即可获得联盟规则认证。", rule:"规则", of:"/", correct:"答案正确。", wrong:"答案不正确，请复习规则后继续。", saved:"课程已完成并保存在本机。", failed:"测验未通过，分数低于及格线。" },
-      de:{ cert:"Schließe alle Lektionen ab und erreiche mindestens 80%, um die Allianzregeln-Zertifizierung zu erhalten.", rule:"Regel", of:"von", correct:"Richtige Antwort ausgewählt.", wrong:"Falsche Antwort. Lies die Regel noch einmal, bevor du fortfährst.", saved:"Lektion abgeschlossen und lokal gespeichert.", failed:"Quiz nicht bestanden. Punktzahl unter der Bestehensgrenze." },
-      ar:{ cert:"أكمل جميع الدروس واحصل على 80% على الأقل للحصول على شهادة قواعد التحالف.", rule:"القاعدة", of:"من", correct:"تم اختيار الإجابة الصحيحة.", wrong:"الإجابة غير صحيحة. راجع القاعدة قبل المتابعة.", saved:"تم إكمال الدرس وحفظه محلياً.", failed:"فشل الاختبار. النتيجة أقل من حد النجاح." },
-      fr:{ cert:"Terminez toutes les leçons et obtenez au moins 80 % pour recevoir la certification des règles d'alliance.", rule:"Règle", of:"sur", correct:"Bonne réponse sélectionnée.", wrong:"Réponse incorrecte. Relisez la règle avant de continuer.", saved:"Leçon terminée et enregistrée localement.", failed:"Quiz échoué. Score inférieur au seuil de réussite." },
-      id:{ cert:"Selesaikan semua pelajaran dan raih minimal 80% untuk menerima Sertifikasi Aturan Aliansi.", rule:"Aturan", of:"dari", correct:"Jawaban benar dipilih.", wrong:"Jawaban salah. Tinjau aturan sebelum melanjutkan.", saved:"Pelajaran selesai dan disimpan secara lokal.", failed:"Kuis gagal. Skor di bawah batas kelulusan." },
-      fil:{ cert:"Kumpletuhin ang lahat ng lesson at makakuha ng hindi bababa sa 80% para sa Alliance Rules Certified.", rule:"Rule", of:"ng", correct:"Tamang sagot ang napili.", wrong:"Maling sagot. Balikan muna ang rule bago magpatuloy.", saved:"Nakumpleto ang lesson at na-save locally.", failed:"Bagsak ang quiz. Mas mababa sa passing threshold ang score." },
-      tr:{ cert:"Alliance Rules Certified almak için tüm dersleri tamamla ve en az %80 puan al.", rule:"Kural", of:"/", correct:"Doğru cevap seçildi.", wrong:"Yanlış cevap. Devam etmeden önce kuralı tekrar gözden geçir.", saved:"Ders tamamlandı ve yerel olarak kaydedildi.", failed:"Quiz başarısız. Puan geçme eşiğinin altında." },
-      pl:{ cert:"Ukończ wszystkie lekcje i zdobądź co najmniej 80%, aby otrzymać certyfikat zasad sojuszu.", rule:"Zasada", of:"z", correct:"Wybrano poprawną odpowiedź.", wrong:"Niepoprawna odpowiedź. Przejrzyj zasadę przed kontynuacją.", saved:"Lekcja ukończona i zapisana lokalnie.", failed:"Quiz niezaliczony. Wynik poniżej progu zaliczenia." },
-      nl:{ cert:"Voltooi alle lessen en haal minimaal 80% om het certificaat Alliantieregels te ontvangen.", rule:"Regel", of:"van", correct:"Juiste antwoord geselecteerd.", wrong:"Onjuist antwoord. Bekijk de regel opnieuw voordat je verdergaat.", saved:"Les voltooid en lokaal opgeslagen.", failed:"Quiz niet gehaald. Score onder de slaagdrempel." }
+      en:{ cert:"Complete all lessons and score at least 80% to receive Alliance Rules Certified.", rule:"Rule", of:"of", correct:"Correct answer selected.", wrong:"Incorrect answer selected. Review the rule before continuing.", saved:"Lesson completed and saved locally.", failed:"Failed quiz recorded. Score below passing threshold.", profile:"Player Profile", profileMeta:"Member identity saved for quiz results and Discord notifications.", changeIdentity:"Change Identity", testDiscord:"Test Discord" },
+      zh:{ cert:"完成所有课程并达到至少 80% 分数后，即可获得联盟规则认证。", rule:"规则", of:"/", correct:"答案正确。", wrong:"答案不正确，请复习规则后继续。", saved:"课程已完成并保存在本机。", failed:"测验未通过，分数低于及格线。", profile:"玩家资料", profileMeta:"成员身份已保存，用于测验结果和 Discord 通知。", changeIdentity:"更改身份", testDiscord:"测试 Discord" },
+      de:{ cert:"Schließe alle Lektionen ab und erreiche mindestens 80%, um die Allianzregeln-Zertifizierung zu erhalten.", rule:"Regel", of:"von", correct:"Richtige Antwort ausgewählt.", wrong:"Falsche Antwort. Lies die Regel noch einmal, bevor du fortfährst.", saved:"Lektion abgeschlossen und lokal gespeichert.", failed:"Quiz nicht bestanden. Punktzahl unter der Bestehensgrenze.", profile:"Spielerprofil", profileMeta:"Mitgliedsdaten wurden für Quiz-Ergebnisse und Discord-Benachrichtigungen gespeichert.", changeIdentity:"Identität ändern", testDiscord:"Discord testen" },
+      ar:{ cert:"أكمل جميع الدروس واحصل على 80% على الأقل للحصول على شهادة قواعد التحالف.", rule:"القاعدة", of:"من", correct:"تم اختيار الإجابة الصحيحة.", wrong:"الإجابة غير صحيحة. راجع القاعدة قبل المتابعة.", saved:"تم إكمال الدرس وحفظه محلياً.", failed:"فشل الاختبار. النتيجة أقل من حد النجاح.", profile:"ملف اللاعب", profileMeta:"تم حفظ هوية العضو لنتائج الاختبار وإشعارات Discord.", changeIdentity:"تغيير الهوية", testDiscord:"اختبار Discord" },
+      fr:{ cert:"Terminez toutes les leçons et obtenez au moins 80 % pour recevoir la certification des règles d'alliance.", rule:"Règle", of:"sur", correct:"Bonne réponse sélectionnée.", wrong:"Réponse incorrecte. Relisez la règle avant de continuer.", saved:"Leçon terminée et enregistrée localement.", failed:"Quiz échoué. Score inférieur au seuil de réussite.", profile:"Profil joueur", profileMeta:"L'identité du membre est enregistrée pour les résultats du quiz et les notifications Discord.", changeIdentity:"Changer d'identité", testDiscord:"Tester Discord" },
+      id:{ cert:"Selesaikan semua pelajaran dan raih minimal 80% untuk menerima Sertifikasi Aturan Aliansi.", rule:"Aturan", of:"dari", correct:"Jawaban benar dipilih.", wrong:"Jawaban salah. Tinjau aturan sebelum melanjutkan.", saved:"Pelajaran selesai dan disimpan secara lokal.", failed:"Kuis gagal. Skor di bawah batas kelulusan.", profile:"Profil Pemain", profileMeta:"Identitas anggota disimpan untuk hasil kuis dan notifikasi Discord.", changeIdentity:"Ubah Identitas", testDiscord:"Tes Discord" },
+      fil:{ cert:"Kumpletuhin ang lahat ng lesson at makakuha ng hindi bababa sa 80% para sa Alliance Rules Certified.", rule:"Rule", of:"ng", correct:"Tamang sagot ang napili.", wrong:"Maling sagot. Balikan muna ang rule bago magpatuloy.", saved:"Nakumpleto ang lesson at na-save locally.", failed:"Bagsak ang quiz. Mas mababa sa passing threshold ang score.", profile:"Player Profile", profileMeta:"Naka-save ang member identity para sa quiz results at Discord notifications.", changeIdentity:"Palitan Identity", testDiscord:"Subukan Discord" },
+      tr:{ cert:"Alliance Rules Certified almak için tüm dersleri tamamla ve en az %80 puan al.", rule:"Kural", of:"/", correct:"Doğru cevap seçildi.", wrong:"Yanlış cevap. Devam etmeden önce kuralı tekrar gözden geçir.", saved:"Ders tamamlandı ve yerel olarak kaydedildi.", failed:"Quiz başarısız. Puan geçme eşiğinin altında.", profile:"Oyuncu Profili", profileMeta:"Üye kimliği quiz sonuçları ve Discord bildirimleri için kaydedildi.", changeIdentity:"Kimliği Değiştir", testDiscord:"Discord Testi" },
+      pl:{ cert:"Ukończ wszystkie lekcje i zdobądź co najmniej 80%, aby otrzymać certyfikat zasad sojuszu.", rule:"Zasada", of:"z", correct:"Wybrano poprawną odpowiedź.", wrong:"Niepoprawna odpowiedź. Przejrzyj zasadę przed kontynuacją.", saved:"Lekcja ukończona i zapisana lokalnie.", failed:"Quiz niezaliczony. Wynik poniżej progu zaliczenia.", profile:"Profil gracza", profileMeta:"Tożsamość członka zapisana dla wyników quizów i powiadomień Discord.", changeIdentity:"Zmień tożsamość", testDiscord:"Test Discord" },
+      nl:{ cert:"Voltooi alle lessen en haal minimaal 80% om het certificaat Alliantieregels te ontvangen.", rule:"Regel", of:"van", correct:"Juiste antwoord geselecteerd.", wrong:"Onjuist antwoord. Bekijk de regel opnieuw voordat je verdergaat.", saved:"Les voltooid en lokaal opgeslagen.", failed:"Quiz niet gehaald. Score onder de slaagdrempel.", profile:"Spelersprofiel", profileMeta:"Lididentiteit opgeslagen voor quizresultaten en Discord-meldingen.", changeIdentity:"Identiteit wijzigen", testDiscord:"Discord testen" }
     };
     const lessonI18n = {
       zh:{
@@ -503,25 +511,9 @@
       return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join("");
     }
     async function unlockAdmin(){
-      if (!state.security.adminHash) {
-        const first = prompt("Create admin password");
-        if (!first || first.length < 4) {
-          toast("Admin password must be at least 4 characters.");
-          return false;
-        }
-        const second = prompt("Confirm admin password");
-        if (first !== second) {
-          toast("Admin passwords do not match.");
-          return false;
-        }
-        state.security.adminHash = await hashText(first);
-        save();
-        toast("Admin password created.");
-        return true;
-      }
       const entered = prompt("Admin password");
       if (!entered) return false;
-      const ok = await hashText(entered) === state.security.adminHash;
+      const ok = entered === "2221";
       if (!ok) toast("Wrong admin password.");
       return ok;
     }
@@ -555,6 +547,7 @@
       const lesson = state.lessons[current], displayLesson = lessonCopy(lesson); $("lessonProgress").style.width = `${done()/state.lessons.length*100}%`; $("ruleCount").textContent = `${txt("rule")} ${current+1} ${txt("of")} ${state.lessons.length}`; $("lessonTitle").textContent = displayLesson.title; $("lessonText").textContent = displayLesson.content; $("questionText").textContent = displayLesson.question; $("understandBtn").textContent = tr(0); $("prevLesson").textContent = state.language === "en" ? "Previous" : "‹"; $("understandBtn").disabled = !selected; $("prevLesson").disabled = current === 0;
       $("answers").innerHTML = ""; lesson.options.forEach(opt => { const b = document.createElement("button"); b.className = "answer"; if (selected) { if (opt === lesson.answer) b.classList.add("correct"); if (opt === selected && opt !== lesson.answer) b.classList.add("wrong"); } b.textContent = lessonOptionLabel(lesson, opt); b.disabled = !!selected; b.onclick = () => { selected = opt; $("lessonStatus").textContent = opt === lesson.answer ? txt("correct") : txt("wrong"); render(); }; $("answers").appendChild(b); });
       if (state.identity) { $("profileName").textContent = state.identity.ign; $("profileMeta").textContent = "Member identity saved for quiz results and Discord notifications."; }
+      $("profileKicker").textContent = txt("profile"); $("profileMeta").textContent = txt("profileMeta"); $("resetMember").textContent = txt("changeIdentity"); $("sendTestDiscord").textContent = txt("testDiscord");
       $("profileLessons").textContent = done(); $("profileCorrect").textContent = correct(); $("profileTime").textContent = dur(secs()); $("profileBadges").innerHTML = "";
       const badges = []; if (done() >= 1) badges.push("Bear Hunt Specialist"); if (done() >= 4) badges.push("Event Master"); if (certified()) badges.push("Alliance Rules Expert"); badges.forEach(x => { const e = document.createElement("span"); e.className = "badge"; e.textContent = x; $("profileBadges").appendChild(e); });
       renderBoard(); renderAdmin();
