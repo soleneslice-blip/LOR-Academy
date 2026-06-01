@@ -517,10 +517,19 @@
     const savedProfile = JSON.parse(localStorage.getItem(PROFILE_KEY) || "null");
     const defaultDiscord = { webhookUrl:APP_CONFIG.discordWebhookUrl, channelName:APP_CONFIG.discordChannelName, roleMention:APP_CONFIG.discordRoleMention };
     const defaultSupabase = { url:APP_CONFIG.supabaseUrl, anonKey:APP_CONFIG.supabaseAnonKey };
+    const nonEmpty = value => String(value || "").trim();
+    const keepOrDefault = (value, fallback) => nonEmpty(value) || nonEmpty(fallback);
     const state = { identity:null, language:"en", lessons:defaultLessons, completions:{}, attempts:[], currentLesson:0, selectedCategory:"All Sections", discord:defaultDiscord, supabase:defaultSupabase, security:{ adminHash:"" }, leaderboard:[], lastLeaderboardPost:"", ...saved };
-    state.discord = { ...defaultDiscord, ...(saved.discord || {}) };
+    state.discord = {
+      webhookUrl:keepOrDefault(saved.discord?.webhookUrl, defaultDiscord.webhookUrl),
+      channelName:keepOrDefault(saved.discord?.channelName, defaultDiscord.channelName),
+      roleMention:keepOrDefault(saved.discord?.roleMention, defaultDiscord.roleMention)
+    };
     state.identity = state.identity || savedProfile;
-    state.supabase = { ...defaultSupabase, ...(saved.supabase || {}) };
+    state.supabase = {
+      url:keepOrDefault(saved.supabase?.url, defaultSupabase.url),
+      anonKey:keepOrDefault(saved.supabase?.anonKey, defaultSupabase.anonKey)
+    };
     state.security = { adminHash:"", ...(saved.security || {}) };
     function defaultCategory(lesson){
       if (lesson.category) return lesson.category;
@@ -830,10 +839,10 @@
     document.addEventListener("click", e => { if (!$("languagePicker").contains(e.target)) $("languagePicker").classList.remove("open"); });
     $("sectionSelect").onchange = () => { state.selectedCategory = $("sectionSelect").value; const indexes = visibleIndexes(); if (indexes.length) current = indexes[0]; selectedAnswers = {}; state.currentLesson = current; save(); startTimer(); render(); };
     $("resetMember").onclick = () => { state.identity = null; state.currentLesson = 0; localStorage.removeItem(PROFILE_KEY); save(); view("identityView"); };
-    $("saveDiscord").onclick = async () => { state.discord = { webhookUrl:$("webhookUrl").value.trim(), channelName:$("channelName").value.trim(), roleMention:$("roleMention").value }; save(); const cloudSaved = await saveDiscordSettingsToCloud(); $("adminStatus").textContent = `Discord settings saved${state.discord.channelName ? ` for ${state.discord.channelName}` : ""}${cloudSaved ? " and shared with all members." : ". Add Supabase settings to share it with all members."}`; };
-    $("saveSupabase").onclick = async () => { state.supabase = { url:normalizeSupabaseUrl($("supabaseUrl").value), anonKey:$("supabaseAnonKey").value.trim() }; save(); $("supabaseUrl").value = state.supabase.url; $("databaseStatus").textContent = "Database settings saved."; await syncFromCloud(true); };
+    $("saveDiscord").onclick = async () => { state.discord = { webhookUrl:$("webhookUrl").value.trim(), channelName:$("channelName").value.trim(), roleMention:$("roleMention").value }; if (!state.discord.webhookUrl) { $("adminStatus").textContent = "Paste a Discord Webhook URL first."; return; } save(); const cloudSaved = await saveDiscordSettingsToCloud(); $("adminStatus").textContent = `Discord settings saved${state.discord.channelName ? ` for ${state.discord.channelName}` : ""}${cloudSaved ? " and shared with all members." : ". Database is not connected, so this device can test Discord but members cannot share the setting yet."}`; };
+    $("saveSupabase").onclick = async () => { state.supabase = { url:normalizeSupabaseUrl(keepOrDefault($("supabaseUrl").value, APP_CONFIG.supabaseUrl)), anonKey:keepOrDefault($("supabaseAnonKey").value, APP_CONFIG.supabaseAnonKey) }; save(); $("supabaseUrl").value = state.supabase.url; $("supabaseAnonKey").value = state.supabase.anonKey; $("databaseStatus").textContent = "Database settings saved."; await syncFromCloud(true); };
     $("syncSupabase").onclick = () => syncFromCloud(true);
-    $("sendTestDiscord").onclick = async () => { const sent = await sendDiscord("test", { lessonTitle:"Webhook Test", score:100, durationSeconds:1 }); $("profileStatus").textContent = sent ? "Test Discord embed sent." : "Add a webhook URL in Admin first."; };
+    $("sendTestDiscord").onclick = async () => { await loadDiscordSettingsFromCloud(); const sent = await sendDiscord("test", { lessonTitle:"Webhook Test", score:100, durationSeconds:1 }); $("profileStatus").textContent = sent ? "Test Discord embed sent." : (state.discord.webhookUrl ? "Discord test failed. Check the webhook URL or Discord rate limit." : "No webhook URL found. Open Admin, paste the webhook, then Save Discord Settings."); };
     $("postLeaderboard").onclick = () => postBoard(true); $("ruleSelect").onchange = hydrateRule;
     $("exportData").onclick = exportBackup;
     $("importData").onclick = () => $("importFile").click();
