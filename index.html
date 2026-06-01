@@ -131,31 +131,7 @@
     .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
     .row > .btn { flex: 1 1 145px; }
     .top-actions { display: flex; gap: 8px; align-items: center; }
-    .language-picker { position: relative; }
-    .lang-trigger { width: 42px; height: 42px; padding: 0; background: rgba(255,255,255,.72); border: 1px solid rgba(255,111,28,.22); border-radius: var(--radius); display: grid; place-items: center; }
-    .lang-menu { position: absolute; right: 0; top: 46px; z-index: 30; display: none; grid-template-columns: repeat(2, 34px); gap: 6px; padding: 8px; border: 1px solid rgba(255,111,28,.22); border-radius: var(--radius); background: rgba(255, 246, 239, .98); box-shadow: 0 12px 28px rgba(188, 83, 24, .18); }
-    .language-picker.open .lang-menu { display: grid; }
-    .lang-option { width: 34px; height: 30px; padding: 0; border-radius: 6px; background: rgba(255,255,255,.55); border: 1px solid rgba(255,111,28,.14); display: grid; place-items: center; }
-    .lang-option.active { box-shadow: inset 0 0 0 2px rgba(255,111,28,.34); }
-    .flag { width: 22px; height: 16px; border-radius: 3px; box-shadow: inset 0 0 0 1px rgba(63,22,6,.18); display: block; overflow: hidden; position: relative; background: #fff; }
-    .flag-us { background: repeating-linear-gradient(180deg, #b22234 0 8%, #fff 8% 16%); }
-    .flag-us:before { content: ""; position: absolute; left: 0; top: 0; width: 42%; height: 54%; background: #3c3b6e; }
-    .flag-in { background: linear-gradient(180deg, #ff9933 0 33%, #fff 33% 66%, #138808 66%); }
-    .flag-in:before { content: ""; position: absolute; left: 50%; top: 50%; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; border: 1px solid #000080; border-radius: 50%; }
-    .flag-cn { background: #de2910; }
-    .flag-cn:before { content: ""; position: absolute; left: 5px; top: 4px; width: 5px; height: 5px; background: #ffde00; clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 56%, 79% 91%, 50% 70%, 21% 91%, 32% 56%, 2% 35%, 39% 35%); }
-    .flag-de { background: linear-gradient(180deg, #000 0 33%, #dd0000 33% 66%, #ffce00 66%); }
-    .flag-sa { background: #006c35; }
-    .flag-sa:before { content: ""; position: absolute; left: 5px; top: 7px; width: 12px; height: 2px; background: #fff; }
-    .flag-fr { background: linear-gradient(90deg, #0055a4 0 33%, #fff 33% 66%, #ef4135 66%); }
-    .flag-id { background: linear-gradient(180deg, #ce1126 0 50%, #fff 50%); }
-    .flag-ph { background: linear-gradient(180deg, #0038a8 0 50%, #ce1126 50%); }
-    .flag-ph:before { content: ""; position: absolute; left: 0; top: 0; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 11px solid #fff; }
-    .flag-tr { background: #e30a17; }
-    .flag-tr:before { content: ""; position: absolute; left: 6px; top: 4px; width: 8px; height: 8px; border-radius: 50%; box-shadow: -2px 0 0 2px #fff; }
-    .flag-tr:after { content: ""; position: absolute; left: 14px; top: 6px; width: 5px; height: 5px; background: #fff; clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 56%, 79% 91%, 50% 70%, 21% 91%, 32% 56%, 2% 35%, 39% 35%); }
-    .flag-pl { background: linear-gradient(180deg, #fff 0 50%, #dc143c 50%); }
-    .flag-nl { background: linear-gradient(180deg, #ae1c28 0 33%, #fff 33% 66%, #21468b 66%); }
+    .lang { width: 86px; }
     .icon-btn { width: 42px; height: 42px; display: grid; place-items: center; border-radius: var(--radius); background: rgba(255,255,255,.72); border: 1px solid rgba(255,111,28,.22); }
     .progress { height: 11px; border-radius: 99px; margin: 12px 0 18px; background: rgba(255,111,28,.16); overflow: hidden; }
     .progress span { display: block; width: 0%; height: 100%; background: linear-gradient(90deg, var(--orange), var(--cyan)); transition: width .24s ease; }
@@ -220,7 +196,7 @@
     @media (max-width: 390px) {
       header, main { padding-left: 12px; padding-right: 12px; }
       .stats { grid-template-columns: 1fr; }
-      .lang-trigger { width: 40px; }
+      .lang { width: 76px; }
       h1 { font-size: 18px; }
     }
   </style>
@@ -230,22 +206,9 @@
     <header>
       <div class="brand"><span class="mark" aria-hidden="true"><img src="cat-icon.png" alt=""></span><h1>LOR <b>Academy</b></h1></div>
       <div class="top-actions">
-        <div id="languagePicker" class="language-picker">
-          <button id="languageButton" class="lang-trigger" type="button" aria-label="Language"><span class="flag flag-us"></span></button>
-          <div id="languageMenu" class="lang-menu">
-            <button class="lang-option" type="button" data-lang="en" title="English"><span class="flag flag-us"></span></button>
-            <button class="lang-option" type="button" data-lang="hi" title="Hindi"><span class="flag flag-in"></span></button>
-            <button class="lang-option" type="button" data-lang="zh" title="Chinese"><span class="flag flag-cn"></span></button>
-            <button class="lang-option" type="button" data-lang="de" title="German"><span class="flag flag-de"></span></button>
-            <button class="lang-option" type="button" data-lang="ar" title="Arabic"><span class="flag flag-sa"></span></button>
-            <button class="lang-option" type="button" data-lang="fr" title="French"><span class="flag flag-fr"></span></button>
-            <button class="lang-option" type="button" data-lang="id" title="Indonesian"><span class="flag flag-id"></span></button>
-            <button class="lang-option" type="button" data-lang="fil" title="Filipino"><span class="flag flag-ph"></span></button>
-            <button class="lang-option" type="button" data-lang="tr" title="Turkish"><span class="flag flag-tr"></span></button>
-            <button class="lang-option" type="button" data-lang="pl" title="Polish"><span class="flag flag-pl"></span></button>
-            <button class="lang-option" type="button" data-lang="nl" title="Dutch"><span class="flag flag-nl"></span></button>
-          </div>
-        </div>
+        <select id="language" class="lang" aria-label="Language">
+          <option value="en">🇺🇸 EN</option><option value="hi">🇮🇳 HI</option><option value="zh">🇨🇳 中文</option><option value="de">🇩🇪 DE</option><option value="ar">🇸🇦 AR</option><option value="fr">🇫🇷 FR</option><option value="id">🇮🇩 ID</option><option value="fil">🇵🇭 FIL</option><option value="tr">🇹🇷 TR</option><option value="pl">🇵🇱 PL</option><option value="nl">🇳🇱 NL</option>
+        </select>
         <button id="adminShortcut" class="icon-btn" title="Admin dashboard" aria-label="Admin dashboard">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 4v5c0 5-3.4 8.7-8 9-4.6-.3-8-4-8-9V7l8-4z"/><path d="M9 12l2 2 4-4"/></svg>
         </button>
@@ -547,7 +510,6 @@
     };
     const tr = n => (i18n[state.language] || i18n.en)[n];
     const txt = key => (uiText[state.language] || uiText.en)[key] || uiText.en[key] || key;
-    const flagClass = lang => ({ en:"flag-us", hi:"flag-in", zh:"flag-cn", de:"flag-de", ar:"flag-sa", fr:"flag-fr", id:"flag-id", fil:"flag-ph", tr:"flag-tr", pl:"flag-pl", nl:"flag-nl" }[lang] || "flag-us");
     const lessonCopy = lesson => {
       const copy = lessonI18n[state.language]?.[lesson.id];
       return copy ? { ...lesson, title:copy[0], content:copy[1], question:copy[2], options:copy[3] } : lesson;
@@ -617,8 +579,7 @@
     }
     function render(){
       ensureVisibleCurrent();
-      $("languageButton").innerHTML = `<span class="flag ${flagClass(state.language)}"></span>`;
-      document.querySelectorAll(".lang-option").forEach(btn => btn.classList.toggle("active", btn.dataset.lang === state.language));
+      $("language").value = state.language;
       $("identityKicker").textContent = txt("identityKicker"); $("identityTitle").textContent = txt("identityTitle"); $("identityCopy").textContent = txt("identityCopy"); $("ignLabel").textContent = txt("ign"); $("allianceLabel").textContent = txt("alliance"); $("stateLabel").textContent = txt("stateNo"); $("startAcademyBtn").textContent = txt("start");
       if (state.identity) { $("ign").value = state.identity.ign; $("alliance").value = state.identity.alliance; $("stateNo").value = state.identity.state; $("welcomeKicker").textContent = "Member Training"; }
       $("xpStat").textContent = done() * 125; $("streakStat").textContent = Math.min(done(),7); $("scoreStat").textContent = pct(avg());
@@ -783,10 +744,7 @@
     document.querySelectorAll(".nav").forEach(b => b.onclick = () => view(b.dataset.view));
     $("adminShortcut").onclick = async () => { if (await unlockAdmin()) view("adminView"); }; $("continueLesson").onclick = () => view("rulesView");
     $("prevLesson").onclick = () => { const indexes = visibleIndexes(), pos = indexes.indexOf(current); if (pos > 0) current = indexes[pos - 1]; selectedAnswers = {}; state.currentLesson = current; save(); startTimer(); render(); };
-    $("understandBtn").onclick = completeLesson;
-    $("languageButton").onclick = () => $("languagePicker").classList.toggle("open");
-    document.querySelectorAll(".lang-option").forEach(btn => btn.onclick = () => { state.language = btn.dataset.lang; $("languagePicker").classList.remove("open"); save(); render(); });
-    document.addEventListener("click", e => { if (!$("languagePicker").contains(e.target)) $("languagePicker").classList.remove("open"); });
+    $("understandBtn").onclick = completeLesson; $("language").onchange = () => { state.language = $("language").value; save(); render(); };
     $("sectionSelect").onchange = () => { state.selectedCategory = $("sectionSelect").value; const indexes = visibleIndexes(); if (indexes.length) current = indexes[0]; selectedAnswers = {}; state.currentLesson = current; save(); startTimer(); render(); };
     $("resetMember").onclick = () => { state.identity = null; state.currentLesson = 0; localStorage.removeItem(PROFILE_KEY); save(); view("identityView"); };
     $("saveDiscord").onclick = () => { state.discord = { webhookUrl:$("webhookUrl").value.trim(), channelName:$("channelName").value.trim(), roleMention:$("roleMention").value }; save(); $("adminStatus").textContent = `Discord settings saved${state.discord.channelName ? ` for ${state.discord.channelName}` : ""}.`; };
