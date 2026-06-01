@@ -61,8 +61,9 @@ For stricter admin security later, add Supabase Auth and restrict lesson editing
 
 ## 6. Discord webhook delivery
 
-Browsers often block direct Discord webhook calls from GitHub Pages because of CORS.
-Use the included `discord-proxy-apps-script.gs` file as a free proxy:
+The clean app uses the direct Discord Webhook URL in Admin > Discord Integration.
+
+If direct Discord webhook delivery is blocked by a browser or hosting provider, the optional `discord-proxy-apps-script.gs` file can still be used as a fallback proxy:
 
 1. Go to https://script.google.com
 2. Create a new project.
@@ -72,6 +73,6 @@ Use the included `discord-proxy-apps-script.gs` file as a free proxy:
    - value: your real Discord webhook URL
 5. Deploy as a Web App.
 6. Copy the Web App URL.
-7. Paste it into Academy Admin > `Discord Proxy URL`.
+7. Use that proxy URL only if you re-add proxy support.
 
-You can keep the direct Discord Webhook URL saved too, but the proxy is the reliable option for hosted static sites.
+For the current clean build, paste your real Discord webhook into `Discord Webhook URL`.

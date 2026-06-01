@@ -336,7 +336,6 @@
           <h2>Discord Integration</h2>
           <p>Admin is password-protected. Enter the admin code to edit Discord, database, and lessons.</p>
           <div class="field"><label for="webhookUrl">Discord Webhook URL</label><input id="webhookUrl" placeholder="https://discord.com/api/webhooks/..."></div>
-          <div class="field"><label for="discordProxyUrl">Discord Proxy URL</label><input id="discordProxyUrl" placeholder="Recommended: Google Apps Script or Supabase Function URL"></div>
           <div class="field"><label for="channelName">Notification Channel</label><input id="channelName" placeholder="#rules-academy"></div>
           <div class="field"><label for="roleMention">Role Mention</label><select id="roleMention"><option value="">No mention</option><option>@everyone</option><option>@Rules Team</option><option>@R4</option><option>@R5</option></select></div>
           <div class="row"><button id="saveDiscord" class="btn">Save Discord Settings</button><button id="postLeaderboard" class="btn secondary">Post Hall of Fame</button></div>
@@ -640,7 +639,7 @@
       board.forEach((x,i)=>{ const e = document.createElement("div"); e.className = "item"; e.innerHTML = `<div><h3>${i+1}. ${esc(x.ign)}</h3><p>${esc(x.alliance)} - State ${esc(x.state)} - ${x.lessonsCompleted} lessons - ${dur(x.totalTimeSeconds)}</p></div><span class="pill">${pct(x.averageScore)}</span>`; $("leaderboard").appendChild(e); });
     }
     function renderAdmin(){
-      $("webhookUrl").value = state.discord.webhookUrl || ""; $("discordProxyUrl").value = state.discord.proxyUrl || ""; $("channelName").value = state.discord.channelName || ""; $("roleMention").value = state.discord.roleMention || "";
+      $("webhookUrl").value = state.discord.webhookUrl || ""; $("channelName").value = state.discord.channelName || ""; $("roleMention").value = state.discord.roleMention || "";
       $("supabaseUrl").value = state.supabase.url || ""; $("supabaseAnonKey").value = state.supabase.anonKey || "";
       current = Math.min(current, Math.max(0, state.lessons.length - 1));
       const previous = $("ruleSelect").value; $("ruleSelect").innerHTML = ""; state.lessons.forEach((l,i)=>{ const o = document.createElement("option"); o.value = i; o.textContent = `${defaultCategory(l)} • ${i+1}. ${l.title}`; $("ruleSelect").appendChild(o); }); if (previous && Number(previous) < state.lessons.length) $("ruleSelect").value = previous; hydrateRule();
@@ -673,7 +672,7 @@
         const imported = data.state || data;
         if (!Array.isArray(imported.lessons)) throw new Error("Backup file has no lessons.");
         Object.assign(state, imported);
-        state.discord = { webhookUrl:"", proxyUrl:"", channelName:"", roleMention:"", ...(imported.discord || {}) };
+        state.discord = { webhookUrl:"", channelName:"", roleMention:"", ...(imported.discord || {}) };
         current = Math.min(state.currentLesson || 0, state.lessons.length - 1);
         selectedAnswers = {};
         save();
@@ -758,17 +757,12 @@
       return { content:`${mention}${m[0]}`, embeds:[{ title:m[0], description:m[1] === COLORS.passed ? m[2] : m[2], color:m[1], fields:type === "leaderboard_daily" ? boardFields() : fields(p), timestamp:new Date().toISOString(), footer:{ text:"LOR Alliance Academy" } }] };
     }
     async function sendDiscord(type, p = {}){
-      const endpoint = state.discord.proxyUrl || state.discord.webhookUrl;
-      if (!endpoint) return false;
+      if (!state.discord.webhookUrl) return false;
       try {
-        if (state.discord.proxyUrl) {
-          await fetch(endpoint, { method:"POST", mode:"no-cors", headers:{ "Content-Type":"text/plain;charset=utf-8" }, body:JSON.stringify(discordPayload(type,p)) });
-          return true;
-        }
-        const res = await fetch(endpoint, { method:"POST", headers:{ "Content-Type":"application/json" }, body:JSON.stringify(discordPayload(type,p)) });
+        const res = await fetch(state.discord.webhookUrl, { method:"POST", headers:{ "Content-Type":"application/json" }, body:JSON.stringify(discordPayload(type,p)) });
         if (!res.ok) throw new Error(`Discord returned ${res.status}`);
         return true;
-      } catch(e) { toast(`Discord notification failed: ${e.message}. Use a Discord Proxy URL if direct webhook is blocked.`); return false; }
+      } catch(e) { toast(`Discord notification failed: ${e.message}`); return false; }
     }
     async function postBoard(force = false){
       const today = new Date().toISOString().slice(0,10);
@@ -795,7 +789,7 @@
     document.addEventListener("click", e => { if (!$("languagePicker").contains(e.target)) $("languagePicker").classList.remove("open"); });
     $("sectionSelect").onchange = () => { state.selectedCategory = $("sectionSelect").value; const indexes = visibleIndexes(); if (indexes.length) current = indexes[0]; selectedAnswers = {}; state.currentLesson = current; save(); startTimer(); render(); };
     $("resetMember").onclick = () => { state.identity = null; state.currentLesson = 0; localStorage.removeItem(PROFILE_KEY); save(); view("identityView"); };
-    $("saveDiscord").onclick = () => { state.discord = { webhookUrl:$("webhookUrl").value.trim(), proxyUrl:$("discordProxyUrl").value.trim(), channelName:$("channelName").value.trim(), roleMention:$("roleMention").value }; save(); $("adminStatus").textContent = `Discord settings saved${state.discord.channelName ? ` for ${state.discord.channelName}` : ""}.`; };
+    $("saveDiscord").onclick = () => { state.discord = { webhookUrl:$("webhookUrl").value.trim(), channelName:$("channelName").value.trim(), roleMention:$("roleMention").value }; save(); $("adminStatus").textContent = `Discord settings saved${state.discord.channelName ? ` for ${state.discord.channelName}` : ""}.`; };
     $("saveSupabase").onclick = async () => { state.supabase = { url:normalizeSupabaseUrl($("supabaseUrl").value), anonKey:$("supabaseAnonKey").value.trim() }; save(); $("supabaseUrl").value = state.supabase.url; $("databaseStatus").textContent = "Database settings saved."; await syncFromCloud(true); };
     $("syncSupabase").onclick = () => syncFromCloud(true);
     $("sendTestDiscord").onclick = async () => { const sent = await sendDiscord("test", { lessonTitle:"Webhook Test", score:100, durationSeconds:1 }); $("profileStatus").textContent = sent ? "Test Discord embed sent." : "Add a webhook URL in Admin first."; };
@@ -840,7 +834,7 @@
       render();
       $("ruleStatus").textContent = `Deleted: ${removed.title}`;
     };
-    $("saveRule").onclick = async () => { const i = Number($("ruleSelect").value || 0), l = state.lessons[i]; const options = [1,2,3,4].map(n => $("ruleOption" + n).value.trim()).filter(Boolean); const quizOptions = answer => [answer, ...options.filter(option => option !== answer)].filter(Boolean).slice(0,4); l.category = $("ruleCategory").value.trim() || "Alliance Rules"; l.title = $("ruleTitle").value.trim() || `Rule ${i+1}`; l.id = l.id || makeUniqueId(l.title); l.content = $("ruleContent").value.trim() || "Rule details pending."; l.question = $("ruleQuestion").value.trim() || "Question pending."; l.answer = $("ruleAnswer").value.trim() || options[0] || "Correct answer"; l.options = options.length ? options : [l.answer, "Wrong answer 1", "Wrong answer 2"]; if (!l.options.includes(l.answer)) l.options = [l.answer, ...l.options].slice(0,4); l.quizzes = [{ question:l.question, options:l.options, answer:l.answer }]; if ($("ruleQuestion2").value.trim() && $("ruleAnswer2").value.trim()) l.quizzes.push({ question:$("ruleQuestion2").value.trim(), options:quizOptions($("ruleAnswer2").value.trim()), answer:$("ruleAnswer2").value.trim() }); if ($("ruleQuestion3").value.trim() && $("ruleAnswer3").value.trim()) l.quizzes.push({ question:$("ruleQuestion3").value.trim(), options:quizOptions($("ruleAnswer3").value.trim()), answer:$("ruleAnswer3").value.trim() }); state.selectedCategory = l.category; await saveLessonToCloud(l, i + 1); save(); render(); await sendDiscord("rule_updated", { lessonTitle:l.title, score:0, durationSeconds:0, badge:"Pending" }); $("ruleStatus").textContent = "Rule updated locally and notification sent when webhook/proxy is configured."; };
+    $("saveRule").onclick = async () => { const i = Number($("ruleSelect").value || 0), l = state.lessons[i]; const options = [1,2,3,4].map(n => $("ruleOption" + n).value.trim()).filter(Boolean); const quizOptions = answer => [answer, ...options.filter(option => option !== answer)].filter(Boolean).slice(0,4); l.category = $("ruleCategory").value.trim() || "Alliance Rules"; l.title = $("ruleTitle").value.trim() || `Rule ${i+1}`; l.id = l.id || makeUniqueId(l.title); l.content = $("ruleContent").value.trim() || "Rule details pending."; l.question = $("ruleQuestion").value.trim() || "Question pending."; l.answer = $("ruleAnswer").value.trim() || options[0] || "Correct answer"; l.options = options.length ? options : [l.answer, "Wrong answer 1", "Wrong answer 2"]; if (!l.options.includes(l.answer)) l.options = [l.answer, ...l.options].slice(0,4); l.quizzes = [{ question:l.question, options:l.options, answer:l.answer }]; if ($("ruleQuestion2").value.trim() && $("ruleAnswer2").value.trim()) l.quizzes.push({ question:$("ruleQuestion2").value.trim(), options:quizOptions($("ruleAnswer2").value.trim()), answer:$("ruleAnswer2").value.trim() }); if ($("ruleQuestion3").value.trim() && $("ruleAnswer3").value.trim()) l.quizzes.push({ question:$("ruleQuestion3").value.trim(), options:quizOptions($("ruleAnswer3").value.trim()), answer:$("ruleAnswer3").value.trim() }); state.selectedCategory = l.category; await saveLessonToCloud(l, i + 1); save(); render(); await sendDiscord("rule_updated", { lessonTitle:l.title, score:0, durationSeconds:0, badge:"Pending" }); $("ruleStatus").textContent = "Rule updated locally and notification sent when webhook is configured."; };
     render(); view(state.identity ? "homeView" : "identityView"); if (state.identity) postBoard(false); syncFromCloud(false);
   </script>
 </body>
