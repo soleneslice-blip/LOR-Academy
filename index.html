@@ -506,12 +506,21 @@
       }
     });
     const $ = id => document.getElementById(id);
+    const APP_CONFIG = {
+      supabaseUrl: "https://ivqcbwvqkrisqpwtxpbw.supabase.co",
+      supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2cWNid3Zxa3Jpc3Fwd3R4cGJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNTA1NzIsImV4cCI6MjA5NTgyNjU3Mn0.NV10R-BpH67Apf99DHOyur76JpHgUlbIw-Ku0rUNbys",
+      discordWebhookUrl: "",
+      discordChannelName: "",
+      discordRoleMention: ""
+    };
     const saved = JSON.parse(localStorage.getItem(KEY) || "{}");
     const savedProfile = JSON.parse(localStorage.getItem(PROFILE_KEY) || "null");
-    const state = { identity:null, language:"en", lessons:defaultLessons, completions:{}, attempts:[], currentLesson:0, selectedCategory:"All Sections", discord:{ webhookUrl:"", channelName:"", roleMention:"" }, supabase:{ url:"", anonKey:"" }, security:{ adminHash:"" }, leaderboard:[], lastLeaderboardPost:"", ...saved };
-    state.discord = { webhookUrl:"", channelName:"", roleMention:"", ...(saved.discord || {}) };
+    const defaultDiscord = { webhookUrl:APP_CONFIG.discordWebhookUrl, channelName:APP_CONFIG.discordChannelName, roleMention:APP_CONFIG.discordRoleMention };
+    const defaultSupabase = { url:APP_CONFIG.supabaseUrl, anonKey:APP_CONFIG.supabaseAnonKey };
+    const state = { identity:null, language:"en", lessons:defaultLessons, completions:{}, attempts:[], currentLesson:0, selectedCategory:"All Sections", discord:defaultDiscord, supabase:defaultSupabase, security:{ adminHash:"" }, leaderboard:[], lastLeaderboardPost:"", ...saved };
+    state.discord = { ...defaultDiscord, ...(saved.discord || {}) };
     state.identity = state.identity || savedProfile;
-    state.supabase = { url:"", anonKey:"", ...(saved.supabase || {}) };
+    state.supabase = { ...defaultSupabase, ...(saved.supabase || {}) };
     state.security = { adminHash:"", ...(saved.security || {}) };
     function defaultCategory(lesson){
       if (lesson.category) return lesson.category;
@@ -705,6 +714,7 @@
         const boardRes = await db.from("leaderboard").select("*").limit(50);
         if (boardRes.error) throw boardRes.error;
         state.leaderboard = (boardRes.data || []).map(row => ({ ign:row.ign, alliance:row.alliance, state:row.state_no, averageScore:Number(row.average_score || 0), lessonsCompleted:Number(row.lessons_completed || 0), totalTimeSeconds:Number(row.total_time_seconds || 0), certified:Boolean(row.certified), updatedAt:row.updated_at || utc() }));
+        await loadDiscordSettingsFromCloud();
         save();
         render();
         if (showMessage) $("databaseStatus").textContent = "Synced with Supabase.";
@@ -728,13 +738,41 @@
       await syncFromCloud(false);
       return true;
     }
+    async function loadDiscordSettingsFromCloud(){
+      if (!cloudReady()) return false;
+      try {
+        const { data, error } = await cloud().from("app_settings").select("value").eq("key", "discord").maybeSingle();
+        if (error) throw error;
+        if (data?.value?.webhookUrl) {
+          state.discord = { webhookUrl:"", channelName:"", roleMention:"", ...data.value };
+          save();
+          return true;
+        }
+      } catch(e) {
+        if ($("adminStatus")) $("adminStatus").textContent = `Discord cloud load failed: ${e.message}`;
+      }
+      return false;
+    }
+    async function saveDiscordSettingsToCloud(){
+      if (!cloudReady()) return false;
+      try {
+        const { error } = await cloud().from("app_settings").upsert({ key:"discord", value:state.discord, updated_at:new Date().toISOString() });
+        if (error) throw error;
+        return true;
+      } catch(e) {
+        $("adminStatus").textContent = `Discord cloud save failed: ${e.message}`;
+        return false;
+      }
+    }
     function fields(p = {}){
       return [
         { name:"Player Name", value:p.ign || state.identity?.ign || "Unknown", inline:true },
         { name:"Alliance", value:p.alliance || state.identity?.alliance || "Unknown", inline:true },
         { name:"State", value:String(p.state || state.identity?.state || "Unknown"), inline:true },
+        { name:"Rule Section", value:p.category || "Alliance Rules", inline:true },
         { name:"Lesson", value:p.lessonTitle || "All Lessons", inline:false },
         { name:"Score", value:p.finalScore !== undefined ? `${p.finalScore}%` : `${p.score ?? Math.round(avg())}%`, inline:true },
+        { name:"Quiz Result", value:p.score !== undefined ? (p.score >= 80 ? "Passed" : "Failed") : (certified() ? "Passed" : "Pending"), inline:true },
         { name:"Completion Time", value:dur(p.durationSeconds || secs()), inline:true },
         { name:"Completion Date", value:p.completedAt || utc(), inline:true },
         { name:"Badge Earned", value:p.badge || (certified() ? "Alliance Rules Expert" : "Pending"), inline:false }
@@ -746,6 +784,7 @@
     }
     function discordPayload(type, p = {}){
       const map = {
+        quiz_completed:["📝 Quiz Completed", p.score >= 80 ? COLORS.passed : COLORS.failed, "A member completed a quiz."],
         lesson_completed:["📝 Alliance Rule Completed", COLORS.passed, "Member finished a lesson."],
         course_completed:["🏆 Alliance Academy Graduated", COLORS.passed, "Completed all Alliance Rules."],
         failed_quiz:["❌ Alliance Quiz Failed", COLORS.failed, "Member scored below the passing threshold."],
@@ -758,6 +797,7 @@
       return { content:`${mention}${m[0]}`, embeds:[{ title:m[0], description:m[1] === COLORS.passed ? m[2] : m[2], color:m[1], fields:type === "leaderboard_daily" ? boardFields() : fields(p), timestamp:new Date().toISOString(), footer:{ text:"LOR Alliance Academy" } }] };
     }
     async function sendDiscord(type, p = {}){
+      if (!state.discord.webhookUrl) await loadDiscordSettingsFromCloud();
       if (!state.discord.webhookUrl) return false;
       try {
         const res = await fetch(state.discord.webhookUrl, { method:"POST", headers:{ "Content-Type":"application/json" }, body:JSON.stringify(discordPayload(type,p)) });
@@ -773,9 +813,9 @@
     }
     async function completeLesson(){
       const l = state.lessons[current], quizzes = lessonQuizzes(l), correctCount = quizzes.reduce((sum, quiz, index) => sum + (selectedAnswers[index] === quiz.answer ? 1 : 0), 0), score = Math.round((correctCount / quizzes.length) * 100), ok = score >= 80, durationSeconds = Math.max(1, Math.round((Date.now()-start)/1000));
-      const rec = { ign:state.identity.ign, alliance:state.identity.alliance, state:state.identity.state, lessonId:l.id, lessonTitle:l.title, score, correct:ok, selectedAnswer:JSON.stringify(selectedAnswers), correctAnswer:quizzes.map(q => q.answer).join("; "), durationSeconds, completedAt:utc() };
+      const rec = { ign:state.identity.ign, alliance:state.identity.alliance, state:state.identity.state, lessonId:l.id, lessonTitle:l.title, category:defaultCategory(l), score, correct:ok, selectedAnswer:JSON.stringify(selectedAnswers), correctAnswer:quizzes.map(q => q.answer).join("; "), durationSeconds, completedAt:utc() };
       state.completions[l.id] = rec; state.attempts.push(rec); updateBoard(); save(); await saveCompletionToCloud(rec);
-      await sendDiscord(ok ? "lesson_completed" : "failed_quiz", rec);
+      await sendDiscord("quiz_completed", rec);
       if (certified()) { await sendDiscord("course_completed", { ...rec, finalScore:Math.round(avg()) }); await sendDiscord("new_member_certified", { ...rec, finalScore:Math.round(avg()), badge:"Alliance Rules Expert" }); }
       selectedAnswers = {}; $("lessonStatus").textContent = ok ? txt("saved") : txt("failed");
       const indexes = visibleIndexes(), pos = indexes.indexOf(current); if (pos >= 0 && pos < indexes.length - 1) current = indexes[pos + 1]; state.currentLesson = current; save(); startTimer(); render(); toast(ok ? "Lesson completed." : "Quiz failed. Review and continue.");
@@ -790,7 +830,7 @@
     document.addEventListener("click", e => { if (!$("languagePicker").contains(e.target)) $("languagePicker").classList.remove("open"); });
     $("sectionSelect").onchange = () => { state.selectedCategory = $("sectionSelect").value; const indexes = visibleIndexes(); if (indexes.length) current = indexes[0]; selectedAnswers = {}; state.currentLesson = current; save(); startTimer(); render(); };
     $("resetMember").onclick = () => { state.identity = null; state.currentLesson = 0; localStorage.removeItem(PROFILE_KEY); save(); view("identityView"); };
-    $("saveDiscord").onclick = () => { state.discord = { webhookUrl:$("webhookUrl").value.trim(), channelName:$("channelName").value.trim(), roleMention:$("roleMention").value }; save(); $("adminStatus").textContent = `Discord settings saved${state.discord.channelName ? ` for ${state.discord.channelName}` : ""}.`; };
+    $("saveDiscord").onclick = async () => { state.discord = { webhookUrl:$("webhookUrl").value.trim(), channelName:$("channelName").value.trim(), roleMention:$("roleMention").value }; save(); const cloudSaved = await saveDiscordSettingsToCloud(); $("adminStatus").textContent = `Discord settings saved${state.discord.channelName ? ` for ${state.discord.channelName}` : ""}${cloudSaved ? " and shared with all members." : ". Add Supabase settings to share it with all members."}`; };
     $("saveSupabase").onclick = async () => { state.supabase = { url:normalizeSupabaseUrl($("supabaseUrl").value), anonKey:$("supabaseAnonKey").value.trim() }; save(); $("supabaseUrl").value = state.supabase.url; $("databaseStatus").textContent = "Database settings saved."; await syncFromCloud(true); };
     $("syncSupabase").onclick = () => syncFromCloud(true);
     $("sendTestDiscord").onclick = async () => { const sent = await sendDiscord("test", { lessonTitle:"Webhook Test", score:100, durationSeconds:1 }); $("profileStatus").textContent = sent ? "Test Discord embed sent." : "Add a webhook URL in Admin first."; };

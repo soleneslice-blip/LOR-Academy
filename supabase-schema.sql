@@ -35,6 +35,12 @@ create table if not exists public.quiz_results (
   completed_at timestamptz not null default now()
 );
 
+create table if not exists public.app_settings (
+  key text primary key,
+  value jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
 create or replace view public.leaderboard as
 select
   ign,
@@ -54,11 +60,14 @@ order by average_score desc, total_time_seconds asc, lessons_completed desc;
 
 alter table public.lessons enable row level security;
 alter table public.quiz_results enable row level security;
+alter table public.app_settings enable row level security;
 
 drop policy if exists "Public can read lessons" on public.lessons;
 drop policy if exists "Public can write lessons" on public.lessons;
 drop policy if exists "Public can read quiz results" on public.quiz_results;
 drop policy if exists "Public can insert quiz results" on public.quiz_results;
+drop policy if exists "Public can read app settings" on public.app_settings;
+drop policy if exists "Public can write app settings" on public.app_settings;
 
 create policy "Public can read lessons"
 on public.lessons for select
@@ -75,6 +84,15 @@ using (true);
 
 create policy "Public can insert quiz results"
 on public.quiz_results for insert
+with check (true);
+
+create policy "Public can read app settings"
+on public.app_settings for select
+using (true);
+
+create policy "Public can write app settings"
+on public.app_settings for all
+using (true)
 with check (true);
 
 insert into public.lessons (slug, category, title, content, question, options, answer, quizzes, position, enabled)

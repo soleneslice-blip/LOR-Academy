@@ -11,7 +11,7 @@
    - `Project URL`
    - `anon public` key
 
-If you already ran an older version of the schema, run the latest `supabase-schema.sql` again. It adds support for rule sections/categories and multiple quizzes per lesson.
+If you already ran an older version of the schema, run the latest `supabase-schema.sql` again. It adds support for rule sections/categories, multiple quizzes per lesson, and shared app settings for Discord.
 
 ## 2. Test database in the app
 
@@ -55,6 +55,18 @@ Your public site URL will look like:
 This version stores Supabase URL and anon key in browser localStorage after you paste them in Admin.
 For a public academy, the anon key is expected to be visible. The SQL policies allow public lesson reads, lesson edits, and quiz result inserts so the static site can work without a backend server.
 
+For every member's phone/computer to connect automatically, put your Supabase values into `APP_CONFIG` near the top of the script in `index.html` before uploading:
+
+```js
+const APP_CONFIG = {
+  supabaseUrl: "https://YOUR-PROJECT.supabase.co",
+  supabaseAnonKey: "YOUR-ANON-PUBLIC-KEY",
+  discordWebhookUrl: "",
+  discordChannelName: "",
+  discordRoleMention: ""
+};
+```
+
 The Admin screen has a browser-side password lock. This prevents normal members from casually opening Admin, but it is not the same as server-side security.
 
 For stricter admin security later, add Supabase Auth and restrict lesson editing to admin users only.
@@ -75,4 +87,4 @@ If direct Discord webhook delivery is blocked by a browser or hosting provider, 
 6. Copy the Web App URL.
 7. Use that proxy URL only if you re-add proxy support.
 
-For the current clean build, paste your real Discord webhook into `Discord Webhook URL`.
+For the current clean build, paste your real Discord webhook into `Discord Webhook URL`, then click `Save Discord Settings`. If Supabase is connected, the webhook settings are saved in the `app_settings` table and shared with all members. Each finished quiz sends a `Quiz Completed` Discord embed with player, alliance, state, rule section, lesson title, score, and completion time.
