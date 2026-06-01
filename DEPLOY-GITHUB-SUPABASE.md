@@ -11,6 +11,8 @@
    - `Project URL`
    - `anon public` key
 
+If you already ran an older version of the schema, run the latest `supabase-schema.sql` again. It adds support for rule sections/categories and multiple quizzes per lesson.
+
 ## 2. Test database in the app
 
 1. Open `index.html` or `alliance-academy.html`.
@@ -56,3 +58,20 @@ For a public academy, the anon key is expected to be visible. The SQL policies a
 The Admin screen has a browser-side password lock. This prevents normal members from casually opening Admin, but it is not the same as server-side security.
 
 For stricter admin security later, add Supabase Auth and restrict lesson editing to admin users only.
+
+## 6. Discord webhook delivery
+
+Browsers often block direct Discord webhook calls from GitHub Pages because of CORS.
+Use the included `discord-proxy-apps-script.gs` file as a free proxy:
+
+1. Go to https://script.google.com
+2. Create a new project.
+3. Paste `discord-proxy-apps-script.gs`.
+4. Add Script Property:
+   - `DISCORD_WEBHOOK_URL`
+   - value: your real Discord webhook URL
+5. Deploy as a Web App.
+6. Copy the Web App URL.
+7. Paste it into Academy Admin > `Discord Proxy URL`.
+
+You can keep the direct Discord Webhook URL saved too, but the proxy is the reliable option for hosted static sites.
